@@ -1,3 +1,3 @@
-class AbstractService:
+class AbstractService(object):
 	def doBackup():
 		raise NotImplementedError()
