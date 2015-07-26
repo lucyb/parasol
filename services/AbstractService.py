@@ -17,5 +17,9 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 class AbstractService(object):
+	
+	backup_location = '~/Documents/Backups'
+	temp_location 	= '/tmp'
+	
 	def doBackup(self):
 		raise NotImplementedError()

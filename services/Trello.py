@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+import urllib2
+import json
+
 class Trello(AbstractService):
 	
 	url	  = 'https://api.trello.com/'
@@ -31,11 +34,12 @@ class Trello(AbstractService):
 			getBoardData(filename, board_id)
    
     
-	def connect(self, urlPath):
-		key_token = key + '&token=' + token
+	def connect(self, url_path):
+		key_token = '?key=' + key + '&token=' + token
 
-		fullUrl = url + Path
-		urllib2.urlopen(fullUrl + '?key=' + key_token)
+		full_url = url.join(url_path).join(key_token)
+		response = urllib2.urlopen(full_url)
+		return json.load(response)
 
 	def boardsToBackup(self):
 		#TODO is there a way of getting all the boards?
@@ -50,27 +54,34 @@ class Trello(AbstractService):
     def getBoardData(self, filename, boardId):
 		print filename
     
-		boardUrl = '1/boards/' + board_id
+		board_url = '1/boards/' + board_id
 		
-		get_url 	= connect(boardUrl)
+		get_url 	= connect(board_url)
 		board 		= json.loads(get_url.read())
 		
-		get_url 	= connect(boardUrl + '/lists')
+		get_url 	= connect(board_url.join('/lists'))
 		lists 		= json.loads(get_url.read())
 		
-		get_url 	= connect(boardUrl + '/cards')
+		get_url 	= connect(board_url.join('/cards'))
 		cards 		= json.loads(get_url.read())
 		
-		get_url 	= connect(boardUrl + '/checklists')
+		get_url 	= connect(board_url.join('/checklists'))
 		checklists 	= json.loads(get_url.read())
 
 		writeData(filename, lists, cards, checklists)
 
 	def writeData(self, boardname, lists, cards, checklists):
 		
-		filename = 'Trello-'.join(boardname.join(str(datetime.date.today()));
-		
-		fhtm = open(filename + '.json', 'w')
+		filename = 'Trello-'.join(boardname.join(str(datetime.date.today())).join('.json');
+	
+		f = None
+		try:
+		    f = open (filename, 'w')
+			f.write(stuff.dumps())
+		finally:
+			if f is not None:
+				f.close()
+	
 		print_header(fhtm, board, lists)
 		print >> fhtm, '<H1>' + board['name'] + ' (' + str(datetime.date.today())
                  + ')</H1>'
