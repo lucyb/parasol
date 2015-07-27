@@ -18,8 +18,5 @@
 
 class AbstractService(object):
 	
-	backup_location = '~/Documents/Backups'
-	temp_location 	= '/tmp'
-	
 	def doBackup(self):
 		raise NotImplementedError()

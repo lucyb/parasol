@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from services import AbstractService
 import requests
 import json
 
@@ -30,17 +31,16 @@ class Pinboard(AbstractService):
 		#do stuff
 		filename = 'Pinboard-{}.json'.format(datetime.date.today())
 		pinboard = connect()
-		#destinationFullPath = os.path.join(destinationPath, self.filename)
-	
 		
-		with open(filename, 'w') as f:
-			f.write(pinboard)
-	
+		with open(filename, 'wb') as fd:
+			for chunk in r.iter_content(chunk_size):
+				fd.write(chunk)
+		
 	def connect(self):
 		
 		auth_token = self.token
 		params     = {'format': 'json', 'auth_token': auth_token}
 		
-		response = requests.get(Pinboard.url, params = params)
+		response = requests.get(Pinboard.url, params = params, stream=True)
 		
-		return response.text
+		return response

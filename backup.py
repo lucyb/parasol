@@ -18,19 +18,18 @@
 
 import click
 from datetime import datetime
+from services import Pinboard
 
-class BackupServices(object):			
-	def __init__(self, servicesList):
-		#do stuff
+class BackupServices(object):
+				
+	def __init__(self, services):
+		for service in services:
+			Pinboard('')
 
 @click.command()
-@click.argument('services', type=click.String)
+@click.argument('services', nargs=-1)
 def run(services):
-	servicesList = []
-	if services != None:
-		servicesList = services.split(' ')
-	
-	backupStuff = BackupServices(servicesList)
+	backupStuff = BackupServices(services)
 	
 if __name__ == '__main__':
 	run()
