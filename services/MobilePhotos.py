@@ -16,14 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-class Mobile(AbstractService):
+class MobilePhotos(AbstractService):
 	
 	def __init__(self):
 		#Required?
 	
 	def doBackup(self):
 		#do stuff
-		#backup clue data
-		#backup weight data
-		#backup notes
-		#backup settings?
+		#backup photos
+			#Call photo import
