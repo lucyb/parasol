@@ -19,9 +19,25 @@
 import click
 from datetime import datetime
 
-class BackupServices(object):			
+class BackupServices(object):	
+	smtpserver = ''
+
+	RECIPIENT  = ''
+	SENDER	   = 'backup@localhost'
+			
 	def __init__(self, servicesList):
 		#do stuff
+
+	def sendEmail(subject, text):
+		from email.Utils import COMMASPACE, formatdate
+		from email import Encoders
+		import os
+		
+		msg = MIMEMultipart()
+		msg['From'] = SENDER
+		msg['To'] = RECIPIENTS
+		msg['Date'] = formatdate(localtime=True)
+		msg['Subject'] = "Home Backup"
 
 @click.command()
 @click.argument('services', type=click.String)

@@ -23,3 +23,7 @@ class AbstractService(object):
 	
 	def doBackup(self):
 		raise NotImplementedError()
+
+	def parseConfig(self):
+		# Find in $XDG_DATA_HOME/???
+		# See https://docs.python.org/3/library/configparser.html

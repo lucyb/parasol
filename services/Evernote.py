@@ -18,8 +18,12 @@
 
 class Evernote(AbstractService):
 	
+	token = 'S=s81:U=891dca:E=15623dff3dc:C=14ecc2ec4f0:P=1cd:A=en-devtoken:V=2:H=15efeae96f9e7ccb0f1df7d5192c2521'
+	notestore_url = 'https://www.evernote.com/shard/s81/notestore'
+	
 	def __init__(self):
 		#Required?
 
 	def doBackup():
 		#do stuff
+		# See https://github.com/tkjacobsen/enote
