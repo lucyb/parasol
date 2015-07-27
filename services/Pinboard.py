@@ -16,34 +16,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-import urllib2
+import requests
 import json
 
 class Pinboard(AbstractService):
+
+	url = 'https://api.pinboard.in/v1/posts/all'
 	
-	def __init__(self):
-		#Required?
+	def __init__(self, token):
+		self.token = token
 	
 	def doBackup(self):
 		#do stuff
-		filename = 'Pinboard-'.join(str(datetime.date.today()).join('.json');
+		filename = 'Pinboard-%s.json' % (datetime.date.today(), )
 		pinboard = connect()
 		#destinationFullPath = os.path.join(destinationPath, self.filename)
 	
-		f = None
-		try:
-		    f = open (filename, 'w')
+		
+		with open(filename, 'w') as f:
 			f.write(pinboard)
-		finally:
-			if f is not None:
-				f.close()
 	
 	def connect(self):
 		
-		auth_token = ''
-		url		   = 'https://api.pinboard.in/v1/posts/all'
-		query_string= '?format=json&auth_token'.join(auth_token)
+		auth_token = self.token
+		params     = {'format': 'json', 'auth_token': auth_token}
 		
-		full_url = url.join(query_string)
-		response = urllib2.urlopen(full_url)
-		return json.load(response)
+		response = requests.get(Pinboard.url, params = params)
+		
+		return response.text
