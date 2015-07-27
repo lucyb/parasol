@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-import urllib2
+import requests
 import json
 
 class Pinboard(AbstractService):
@@ -38,8 +38,8 @@ class Pinboard(AbstractService):
 		
 		auth_token = ''
 		url		   = 'https://api.pinboard.in/v1/posts/all'
-		query_string= '?format=json&auth_token'.join(auth_token)
+		params     = {'format': 'json', 'auth_token': auth_token}
 		
-		full_url = url.join(query_string)
-		response = urllib2.urlopen(full_url)
-		return json.load(response)
+		response = requests.get(url, params = params)
+		
+		return response.text
