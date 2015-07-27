@@ -26,7 +26,7 @@ class Pinboard(AbstractService):
 	
 	def doBackup(self):
 		#do stuff
-		filename = 'Pinboard-'.join(str(datetime.date.today()).join('.json');
+		filename = 'Pinboard-%s.json' % (datetime.date.today(), )
 		pinboard = connect()
 		#destinationFullPath = os.path.join(destinationPath, self.filename)
 	
