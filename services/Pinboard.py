@@ -30,13 +30,9 @@ class Pinboard(AbstractService):
 		pinboard = connect()
 		#destinationFullPath = os.path.join(destinationPath, self.filename)
 	
-		f = None
-		try:
-		    f = open (filename, 'w')
+		
+		with open(filename, 'w') as f:
 			f.write(pinboard)
-		finally:
-			if f is not None:
-				f.close()
 	
 	def connect(self):
 		
