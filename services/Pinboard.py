@@ -20,9 +20,11 @@ import requests
 import json
 
 class Pinboard(AbstractService):
+
+	url = 'https://api.pinboard.in/v1/posts/all'
 	
-	def __init__(self):
-		#Required?
+	def __init__(self, token):
+		self.token = token
 	
 	def doBackup(self):
 		#do stuff
@@ -36,10 +38,9 @@ class Pinboard(AbstractService):
 	
 	def connect(self):
 		
-		auth_token = ''
-		url		   = 'https://api.pinboard.in/v1/posts/all'
+		auth_token = self.token
 		params     = {'format': 'json', 'auth_token': auth_token}
 		
-		response = requests.get(url, params = params)
+		response = requests.get(Pinboard.url, params = params)
 		
 		return response.text
