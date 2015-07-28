@@ -19,6 +19,7 @@
 from services.AbstractService import AbstractService
 import datetime
 import requests
+import json
 
 class Pinboard(AbstractService):
 
@@ -31,14 +32,14 @@ class Pinboard(AbstractService):
 		#do stuff
 		filename = 'Pinboard-{}.json'.format(datetime.date.today())
 		pinboard = self.connect()
-		self.write(filename, pinboard)
+		self.write(filename, json.dumps(pinboard.json()))
 	
 	def connect(self):
 
 		auth_token = self.token
 		params     = {'format': 'json', 'auth_token': auth_token}
 
-		response = requests.get(Pinboard.url, params = params, stream=True)
+		response = requests.get(Pinboard.url, params = params)
 		
 		response.raise_for_status()		#Throw error if response is not 200
 		
