@@ -38,7 +38,7 @@ class Pinboard(AbstractService):
 		auth_token = self.token
 		params     = {'format': 'json', 'auth_token': auth_token}
 
-		response = requests.get(Pinboard.url, params = params, stream=True)
+		response = requests.get(Pinboard.url, params = params, stream=True, verify=True)
 		
 		response.raise_for_status()		#Throw error if response is not 200
 		
