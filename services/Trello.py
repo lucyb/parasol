@@ -32,14 +32,14 @@ class Trello(AbstractService):
 
         def do_backup(self):
             #For each board, fetch all data and write the json to a file
-            for board_name, board_id in self.boards_to_backup().items():
-                self.write_board_data(board_name, board_id)
+            for board_id, board_name in self.boards_to_backup().items():
+                self.write_board_data(board_id, board_name)
 
         def connect(self, url_path):
             params   = {'format': 'json', 'key' : self.key, 'token': self.token}
             
             response = requests.get(self.url + url_path, params = params, stream=True)
-            click.echo(response.url)
+            
             response.raise_for_status()     #Throw error if response is not 200
 
             return response
@@ -53,21 +53,19 @@ class Trello(AbstractService):
             
             return board_dict
 
-        def write_board_data(self, board_name, board_id):
-                filename = 'Trello-{}-{}.json'.format(board_name, str(datetime.date.today()));
-                
-                #This should get all information for this board
-                board_url = '1/boards/' + board_id
-
-                board = self.connect(board_url)
-                self.write(filename, board, append = True)
+        def write_board_data(self, board_id, board_name):
+            filename = 'Trello-{0}-{1}.json'.format(board_name, str(datetime.date.today()));
             
-                lists = self.connect(board_url.join('/lists'))
-                self.write(filename, lists, append = True)
+            board_url = '1/boards/' + board_id
+                        
+            board = self.connect(board_url)
+            self.write(filename, board, append = True)
+        
+            lists = self.connect(board_url + '/lists')
+            self.write(filename, lists, append = True)
 
-                cards = self.connect(board_url.join('/cards'))
-                self.write(filename, cards, append = True)
+            cards = self.connect(board_url + '/cards')
+            self.write(filename, cards, append = True)
 
-                checklists = self.connect(board_url.join('/checklists'))
-                self.write(filename, checklists, append = True)
-
+            checklists = self.connect(board_url + '/checklists')
+            self.write(filename, checklists, append = True)
