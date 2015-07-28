@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 #
-# Copyright 2015 Lucy B
+# Copyright 2015 Lucy B, Jonathan Stott
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,17 +15,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
-from paramiko import SSHClient
-from os.path import expanduser, expandvars, join, abspath, lexists, dirname, isdir
-from os import mkdir
-from stat import S_ISDIR
+import os.path as ops
+import os
+import stat
+import paramiko
 import click
 
 
 class MobilePhotos(AbstractService):
 
     def __init__(self, backup_location, host, remote_path, username=None, port=22, password=None):
-        self.backup_location = expandvars(expanduser(backup_location))
+        self.backup_location = ops.expandvars(ops.expanduser(backup_location))
         self.host            = host
         self.remote_path     = remote_path
         self.port            = port
@@ -47,18 +46,18 @@ class MobilePhotos(AbstractService):
         for filename in self.find_all('.'):
 
             # figure out where the file would be, if we already had it
-            local = abspath(join(self.backup_location, filename))
+            local = ops.abspath(ops.join(self.backup_location, filename))
 
             # use lexists to account for git-annex and files possibly living in a remote location.
-            if lexists(local):
+            if ops.lexists(local):
                 click.echo("{} ... OK!".format(local)) # yay, report and move on
             else: # get it!
                 click.echo("{} ... fetching...".format(local))
-                directory = dirname(local)
+                directory = ops.dirname(local)
 
-                if not isdir(directory):
+                if not ops.isdir(directory):
                     # make directories if we need to
-                    mkdir(directory)
+                    os.mkdir(directory)
 
                 # fetch it!
                 self.sftp.get(filename, local)
@@ -66,7 +65,7 @@ class MobilePhotos(AbstractService):
 
     def connect(self):
         # make a client
-        client = SSHClient()
+        client = paramiko.SSHClient()
 
         # load up user's host keys
         client.load_system_host_keys()
@@ -86,7 +85,7 @@ class MobilePhotos(AbstractService):
             path = '/'.join([directory, item.filename])
 
             # if we're a file, yield it
-            if not S_ISDIR(item.st_mode):
+            if not stat.S_ISDIR(item.st_mode):
                 yield path
             else: # path is a dir
                 try: # so we recurse!
