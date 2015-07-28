@@ -5,7 +5,7 @@ mobile phone.
 
 ## How does it work?
 
-You'll need python 3 and click. Then just run it with the list of 
+You'll need python 3, click, paramiko and requests. Then just run it with the list of 
 services to backup as arguments or no arguments to back them all up
 
 ## Usage
@@ -15,4 +15,4 @@ Usage: backup.py [OPTIONS] SERVICES
 
 Options:
   --help                  Show this message and exit.
-``` 
+```
