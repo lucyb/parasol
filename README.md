@@ -5,8 +5,8 @@ mobile phone.
 
 ## How does it work?
 
-You'll need python 3, click, paramiko and requests. To get these, the easiest
-way is to run
+You'll need python 3.  You will also need the click, paramiko and requests
+libraries. To get these, the easiest way is to run
 
 ``` sh
 pip install -r requirements.txt
