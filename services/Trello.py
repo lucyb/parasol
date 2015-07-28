@@ -61,14 +61,14 @@ class Trello(AbstractService):
                 board_url = '1/boards/' + board_id
 
                 board = self.connect(board_url)
-                self.write(filename, board, True)
+                self.write(filename, board, append = True)
 
                 lists = self.connect(board_url.join('/lists'))
-                self.write(filename, lists, True)
+                self.write(filename, lists, append = True)
 
                 cards = self.connect(board_url.join('/cards'))
-                self.write(filename, cards, True)
+                self.write(filename, cards, append = True)
 
                 checklists = self.connect(board_url.join('/checklists'))
-                self.write(filename, checklists, True)
+                self.write(filename, checklists, append = True)
 
