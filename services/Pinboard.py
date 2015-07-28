@@ -19,7 +19,6 @@
 from services.AbstractService import AbstractService
 import datetime
 import requests
-import json
 
 class Pinboard(AbstractService):
 
@@ -28,21 +27,20 @@ class Pinboard(AbstractService):
 	def __init__(self, token):
 		self.token = token
 
-	def doBackup(self):
+	def do_backup(self):
 		#do stuff
 		filename = 'Pinboard-{}.json'.format(datetime.date.today())
 		pinboard = self.connect()
-
-		chunk_size = 10
-		with open(filename, 'wb') as fd:
-			for chunk in pinboard.iter_content(chunk_size):
-				fd.write(chunk)
-
+		self.write(filename, pinboard)
+	
 	def connect(self):
 
 		auth_token = self.token
 		params     = {'format': 'json', 'auth_token': auth_token}
 
 		response = requests.get(Pinboard.url, params = params, stream=True)
+
+		if response.status_code != requests.codes.ok:
+			raise Exception(response.raise_for_status())
 
 		return response

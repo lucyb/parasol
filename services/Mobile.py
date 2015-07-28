@@ -21,7 +21,7 @@ class Mobile(AbstractService):
 	def __init__(self):
 		#Required?
 	
-	def doBackup(self):
+	def do_backup(self):
 		#do stuff
 		#backup clue data
 		#backup weight data

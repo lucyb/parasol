@@ -18,5 +18,16 @@
 
 class AbstractService(object):
 	
-	def doBackup(self):
+	def do_backup(self):
 		raise NotImplementedError()
+		
+	def write(self, filename, response, append=False):
+		mode = 'wb'
+		if append:
+			mode = 'ab'
+			
+		chunk_size = 10
+		with open(filename, mode) as fd:
+			for chunk in response.iter_content(chunk_size):
+				fd.write(chunk)
+
