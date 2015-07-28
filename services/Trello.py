@@ -40,8 +40,7 @@ class Trello(AbstractService):
 
             response = requests.get(Trello.url.join(url_path), params = params, stream=True)
 
-            if response.status_code != requests.codes.ok:
-                raise Exception(response.raise_for_status())
+            response.raise_for_status()     #Throw error if response is not 200
 
             return response
 

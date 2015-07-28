@@ -39,8 +39,7 @@ class Pinboard(AbstractService):
 		params     = {'format': 'json', 'auth_token': auth_token}
 
 		response = requests.get(Pinboard.url, params = params, stream=True)
-
-		if response.status_code != requests.codes.ok:
-			raise Exception(response.raise_for_status())
-
+		
+		response.raise_for_status()		#Throw error if response is not 200
+		
 		return response
