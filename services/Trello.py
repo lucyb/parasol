@@ -38,7 +38,7 @@ class Trello(AbstractService):
         def connect(self, url_path):
             params   = {'format': 'json', 'key' : self.key, 'token': self.token}
             
-            response = requests.get(self.url + url_path, params = params, stream=True, verify=True)
+            response = requests.get(self.url + url_path, params = params, verify=True)
             
             response.raise_for_status()     #Throw error if response is not 200
 
@@ -57,15 +57,20 @@ class Trello(AbstractService):
             filename = 'Trello-{0}-{1}.json'.format(board_name, str(datetime.date.today()));
             
             board_url = '1/boards/' + board_id
+                 
+            board_info = {}
                         
             board = self.connect(board_url)
-            self.write(filename, board, append = True)
-        
+            board_info['board'] = board
+            
             lists = self.connect(board_url + '/lists')
-            self.write(filename, lists, append = True)
+            board_info['lists'] = lists
 
             cards = self.connect(board_url + '/cards')
-            self.write(filename, cards, append = True)
-
+            board_info['cards'] = cards
+            
             checklists = self.connect(board_url + '/checklists')
-            self.write(filename, checklists, append = True)
+            board_info['checklists'] = checklists
+            
+            self.write(filename, json.dumps(board_info))
+        
