@@ -21,13 +21,11 @@ class AbstractService(object):
 	def do_backup(self):
 		raise NotImplementedError()
 		
-	def write(self, filename, response, append=False):
-		mode = 'wb'
+	def write(self, filename, data, append=False):
+		mode = 'w'
 		if append:
-			mode = 'ab'
+			mode = 'a'
 			
-		chunk_size = None
 		with open(filename, mode) as fd:
-			for chunk in response.iter_content(chunk_size):
-				fd.write(chunk)
+			fd.write(data)
 

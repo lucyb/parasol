@@ -17,17 +17,29 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 import click
+import services
+from services.AbstractService import AbstractService
 from services.Pinboard import Pinboard
+from services.Trello import Trello 
+import sys
+import inspect
 
 class BackupServices(object):
 				
 	def __init__(self, services):
 		#if services is empty, then fetch all classes in the services 
 		#module that are a subclass of AbstractService
-		for service in services:
-			service = Pinboard('')
-			service.doBackup()
+		all_services = self.list_services()
+		for name, service in all_services:
+			click.echo(name)
+			service('')
 			
+			
+	def list_services(self):
+		for name, obj in inspect.getmembers(sys.modules[__name__], inspect.isclass):
+			if (issubclass(obj, AbstractService) and name is not 'AbstractService'):
+				yield name, obj
+				
 @click.command()
 @click.argument('services', nargs=-1)
 def run(services):
