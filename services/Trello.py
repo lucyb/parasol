@@ -38,7 +38,7 @@ class Trello(AbstractService):
         def connect(self, url_path):
             params   = {'format': 'json', 'key' : self.key, 'token': self.token}
             
-            response = requests.get(self.url + url_path, params = params, stream=True)
+            response = requests.get(self.url + url_path, params = params, stream=True, verify=True)
             
             response.raise_for_status()     #Throw error if response is not 200
 
