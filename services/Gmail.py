@@ -17,7 +17,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 class Gmail(AbstractService):
-	
+
 	def __init__(self):
 		#Required?
 

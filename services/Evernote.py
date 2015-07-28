@@ -21,7 +21,7 @@ import datetime
 import requests
 
 class Evernote(AbstractService):
-	
+
 	def __init__(self):
 		#Required?
 

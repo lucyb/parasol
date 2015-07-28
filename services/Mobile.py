@@ -17,10 +17,10 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 class Mobile(AbstractService):
-	
+
 	def __init__(self):
 		#Required?
-	
+
 	def do_backup(self):
 		#do stuff
 		#backup clue data

@@ -17,15 +17,15 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 class AbstractService(object):
-	
+
 	def do_backup(self):
 		raise NotImplementedError()
-		
+
 	def write(self, filename, data, append=False):
 		mode = 'w'
 		if append:
 			mode = 'a'
-			
+
 		with open(filename, mode) as fd:
 			fd.write(data)
 

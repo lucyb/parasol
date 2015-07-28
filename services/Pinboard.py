@@ -33,7 +33,7 @@ class Pinboard(AbstractService):
 		filename = 'Pinboard-{}.json'.format(datetime.date.today())
 		pinboard = self.connect()
 		self.write(filename, json.dumps(pinboard.json()))
-	
+
 	def connect(self):
 
 		auth_token = self.token
@@ -42,5 +42,5 @@ class Pinboard(AbstractService):
 		response = requests.get(Pinboard.url, params = params, stream=True, verify=True)
 
 		response.raise_for_status()		#Throw error if response is not 200
-		
+
 		return response
