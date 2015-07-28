@@ -26,7 +26,7 @@ class AbstractService(object):
 		if append:
 			mode = 'ab'
 			
-		chunk_size = 10
+		chunk_size = None
 		with open(filename, mode) as fd:
 			for chunk in response.iter_content(chunk_size):
 				fd.write(chunk)
