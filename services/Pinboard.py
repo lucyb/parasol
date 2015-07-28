@@ -16,31 +16,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from services import AbstractService
+from services.AbstractService import AbstractService
+import datetime
 import requests
 import json
 
 class Pinboard(AbstractService):
 
 	url = 'https://api.pinboard.in/v1/posts/all'
-	
+
 	def __init__(self, token):
 		self.token = token
-	
+
 	def doBackup(self):
 		#do stuff
 		filename = 'Pinboard-{}.json'.format(datetime.date.today())
-		pinboard = connect()
-		
+		pinboard = self.connect()
+
+		chunk_size = 10
 		with open(filename, 'wb') as fd:
-			for chunk in r.iter_content(chunk_size):
+			for chunk in pinboard.iter_content(chunk_size):
 				fd.write(chunk)
-		
+
 	def connect(self):
-		
+
 		auth_token = self.token
 		params     = {'format': 'json', 'auth_token': auth_token}
-		
+
 		response = requests.get(Pinboard.url, params = params, stream=True)
-		
+
 		return response

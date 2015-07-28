@@ -17,15 +17,17 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 import click
-from datetime import datetime
-from services import Pinboard
+from services.Pinboard import Pinboard
 
 class BackupServices(object):
 				
 	def __init__(self, services):
+		#if services is empty, then fetch all classes in the services 
+		#module that are a subclass of AbstractService
 		for service in services:
-			Pinboard('')
-
+			service = Pinboard('')
+			service.doBackup()
+			
 @click.command()
 @click.argument('services', nargs=-1)
 def run(services):
