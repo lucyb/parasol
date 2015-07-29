@@ -25,7 +25,7 @@ import json
 class Trello(AbstractService):
     """All your organisation with everyone"""
 
-    #url   = 'https://api.trello.com/'
+    url = 'https://api.trello.com/'
 
     def do_backup(self):
         #For each board, fetch all data and write the json to a file
