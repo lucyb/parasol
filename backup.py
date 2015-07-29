@@ -21,6 +21,7 @@ import services
 from services.AbstractService import AbstractService
 from services.Pinboard import Pinboard
 from services.Trello import Trello
+import inspect
 
 class BackupServices(object):
 
@@ -38,7 +39,7 @@ def list_services(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
     for name, service in AbstractService.list_services():
-        click.echo(name)
+        click.echo("{} - {}".format(name, inspect.getdoc(service)))
     ctx.exit()
 
 @click.command()

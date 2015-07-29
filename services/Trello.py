@@ -23,6 +23,7 @@ import click
 import json
 
 class Trello(AbstractService):
+    """All your organisation with everyone"""
 
     url   = 'https://api.trello.com/'
 

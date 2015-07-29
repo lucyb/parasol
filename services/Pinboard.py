@@ -22,6 +22,7 @@ import requests
 import json
 
 class Pinboard(AbstractService):
+    """All of your bookmarks"""
 
     url = 'https://api.pinboard.in/v1/posts/all'
 
