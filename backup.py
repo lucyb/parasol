@@ -41,8 +41,20 @@ class BackupServices(object):
                 yield name, obj
 
 
+def list_services(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    for name, service in BackupServices.list_services():
+        click.echo(name)
+    ctx.exit()
+
 @click.command()
 @click.argument('services', nargs=-1)
+@click.option('--list', help         = 'List services we know how to back up',
+                        is_flag      = True,
+                        callback     = list_services,
+                        expose_value = False,
+                        is_eager     = True)
 def run(services):
     backupStuff = BackupServices(services)
 
