@@ -29,22 +29,17 @@ class BackupServices(object):
     def __init__(self, services):
         #if services is empty, then fetch all classes in the services
         #module that are a subclass of AbstractService
-        all_services = self.list_services()
+        all_services = AbstractService.list_services()
         for name, service in all_services:
             click.echo(name)
             service('')
 
-    @staticmethod
-    def list_services():
-        for name, obj in inspect.getmembers(sys.modules[__name__], inspect.isclass):
-            if (issubclass(obj, AbstractService) and name is not 'AbstractService'):
-                yield name, obj
 
 
 def list_services(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
-    for name, service in BackupServices.list_services():
+    for name, service in AbstractService.list_services():
         click.echo(name)
     ctx.exit()
 
