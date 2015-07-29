@@ -22,10 +22,11 @@ from services.AbstractService import AbstractService
 from services.Pinboard import Pinboard
 from services.Trello import Trello
 import inspect
+import configparser
 
 class BackupServices(object):
 
-    def __init__(self, services):
+    def __init__(self, services, config):
         #if services is empty, then fetch all classes in the services
         #module that are a subclass of AbstractService
         all_services = AbstractService.list_services()
@@ -33,6 +34,10 @@ class BackupServices(object):
             click.echo(name)
             service('')
 
+    def readConfig(self, config_file, serviceName):
+        config = configparser.ConfigParser()
+        config.read(config_file)
+        return config[service_name]
 
 # List services callback
 #
@@ -62,8 +67,10 @@ def list_services(ctx, param, value):
                         callback     = list_services,
                         expose_value = False,
                         is_eager     = True)
-def run(services):
-    backupStuff = BackupServices(services)
+@click.option('--config', help='Specify location of the config file',
+                         default='config.ini')
+def run(services, config):
+	backupStuff = BackupServices(services, config)
 
 if __name__ == '__main__':
     run()
