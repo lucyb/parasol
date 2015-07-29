@@ -21,8 +21,6 @@ import services
 from services.AbstractService import AbstractService
 from services.Pinboard import Pinboard
 from services.Trello import Trello
-import sys
-import inspect
 
 class BackupServices(object):
 
