@@ -17,36 +17,32 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 import click
-from datetime import datetime
+import services
+from services.AbstractService import AbstractService
+from services.Pinboard import Pinboard
+from services.Trello import Trello
+import sys
+import inspect
 
-class BackupServices(object):	
-	smtpserver = ''
+class BackupServices(object):
 
-	RECIPIENT  = ''
-	SENDER	   = 'backup@localhost'
-			
-	def __init__(self, servicesList):
-		#do stuff
+	def __init__(self, services):
+		#if services is empty, then fetch all classes in the services
+		#module that are a subclass of AbstractService
+		all_services = self.list_services()
+		for name, service in all_services:
+			click.echo(name)
+			service('')
 
-	def sendEmail(subject, text):
-		from email.Utils import COMMASPACE, formatdate
-		from email import Encoders
-		import os
-		
-		msg = MIMEMultipart()
-		msg['From'] = SENDER
-		msg['To'] = RECIPIENTS
-		msg['Date'] = formatdate(localtime=True)
-		msg['Subject'] = "Home Backup"
+	def list_services(self):
+		for name, obj in inspect.getmembers(sys.modules[__name__], inspect.isclass):
+			if (issubclass(obj, AbstractService) and name is not 'AbstractService'):
+				yield name, obj
 
 @click.command()
-@click.argument('services', type=click.String)
+@click.argument('services', nargs=-1)
 def run(services):
-	servicesList = []
-	if services != None:
-		servicesList = services.split(' ')
-	
-	backupStuff = BackupServices(servicesList)
-	
+	backupStuff = BackupServices(services)
+
 if __name__ == '__main__':
 	run()

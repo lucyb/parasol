@@ -1,0 +1,16 @@
+[backup]
+backup_location=
+tmp_location=
+
+[evernote]
+token=
+url=
+
+[trello]
+key=
+token=
+url=
+
+[pinboard]
+token=
+url=

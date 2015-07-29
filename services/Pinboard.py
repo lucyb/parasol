@@ -16,31 +16,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from services.AbstractService import AbstractService
+import datetime
 import requests
 import json
 
 class Pinboard(AbstractService):
 
 	url = 'https://api.pinboard.in/v1/posts/all'
-	
+
 	def __init__(self, token):
 		self.token = token
-	
-	def doBackup(self):
+
+	def do_backup(self):
 		#do stuff
 		filename = 'Pinboard-{}.json'.format(datetime.date.today())
-		pinboard = connect()
-		#destinationFullPath = os.path.join(destinationPath, self.filename)
-	
-		
-		with open(filename, 'w') as f:
-			f.write(pinboard)
-	
+		pinboard = self.connect()
+		self.write(filename, json.dumps(pinboard.json()))
+
 	def connect(self):
-		
+
 		auth_token = self.token
 		params     = {'format': 'json', 'auth_token': auth_token}
-		
-		response = requests.get(Pinboard.url, params = params)
-		
-		return response.text
+
+		response = requests.get(Pinboard.url, params = params, stream=True, verify=True)
+
+		response.raise_for_status()		#Throw error if response is not 200
+
+		return response

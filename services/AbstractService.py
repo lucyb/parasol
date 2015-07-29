@@ -17,13 +17,14 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 class AbstractService(object):
-	
-	backup_location = '~/Documents/Backups'
-	temp_location 	= '/tmp'
-	
-	def doBackup(self):
+
+	def do_backup(self):
 		raise NotImplementedError()
 
-	def parseConfig(self):
-		# Find in $XDG_DATA_HOME/???
-		# See https://docs.python.org/3/library/configparser.html
+	def write(self, filename, data, append=False):
+		mode = 'w'
+		if append:
+			mode = 'a'
+
+		with open(filename, mode) as fd:
+			fd.write(data)
