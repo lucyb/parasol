@@ -1,5 +1,5 @@
 [Backup]
-backup_location=
+default_backup_location=
 tmp_location=
 
 [Evernote]
