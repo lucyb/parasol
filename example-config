@@ -1,16 +1,16 @@
-[backup]
+[Backup]
 backup_location=
 tmp_location=
 
-[evernote]
+[Evernote]
 token=
 url=
 
-[trello]
+[Trello]
 key=
 token=
 url=
 
-[pinboard]
+[Pinboard]
 token=
 url=
