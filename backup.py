@@ -34,7 +34,8 @@ class BackupServices(object):
             click.echo(name)
             service('')
 
-    def list_services(self):
+    @staticmethod
+    def list_services():
         for name, obj in inspect.getmembers(sys.modules[__name__], inspect.isclass):
             if (issubclass(obj, AbstractService) and name is not 'AbstractService'):
                 yield name, obj
