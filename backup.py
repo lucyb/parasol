@@ -21,28 +21,48 @@ import services
 from services.AbstractService import AbstractService
 from services.Pinboard import Pinboard
 from services.Trello import Trello
-import sys
 import inspect
 
 class BackupServices(object):
 
-	def __init__(self, services):
-		#if services is empty, then fetch all classes in the services
-		#module that are a subclass of AbstractService
-		all_services = self.list_services()
-		for name, service in all_services:
-			click.echo(name)
-			service('')
+    def __init__(self, services):
+        #if services is empty, then fetch all classes in the services
+        #module that are a subclass of AbstractService
+        all_services = AbstractService.list_services()
+        for name, service in all_services:
+            click.echo(name)
+            service('')
 
-	def list_services(self):
-		for name, obj in inspect.getmembers(sys.modules[__name__], inspect.isclass):
-			if (issubclass(obj, AbstractService) and name is not 'AbstractService'):
-				yield name, obj
+# List services callback
+#
+# This uses a callback to interupt the usual argument handling
+# http://click.pocoo.org/4/options/#callbacks-and-eager-options
+#
+# ctx is the script execution context, which in this case we use to exit the
+# program (And also check for resiliant parsing, in which case we shouldn't
+# exit.
+def list_services(ctx, param, value):
+    """Callback used for the --list commandline flag, which returns a list of the services the program can potentially back up"""
+    # If we weren't called with a value (not sure how this can happen) or we're in the resiliant parsing / no errors mode give up now.
+    if not value or ctx.resilient_parsing:
+        return
+
+    # iterate over the services list, printing names and the docstrings
+    for name, service in AbstractService.list_services():
+        click.echo("{} - {}".format(name, inspect.getdoc(service)))
+
+    # exit with status 0
+    ctx.exit(0)
 
 @click.command()
 @click.argument('services', nargs=-1)
+@click.option('--list', help         = 'List services we know how to back up',
+                        is_flag      = True,
+                        callback     = list_services,
+                        expose_value = False,
+                        is_eager     = True)
 def run(services):
-	backupStuff = BackupServices(services)
+    backupStuff = BackupServices(services)
 
 if __name__ == '__main__':
-	run()
+    run()

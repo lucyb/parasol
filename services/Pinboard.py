@@ -22,25 +22,26 @@ import requests
 import json
 
 class Pinboard(AbstractService):
+    """All of your bookmarks"""
 
-	url = 'https://api.pinboard.in/v1/posts/all'
+    url = 'https://api.pinboard.in/v1/posts/all'
 
-	def __init__(self, token):
-		self.token = token
+    def __init__(self, token):
+        self.token = token
 
-	def do_backup(self):
-		#do stuff
-		filename = 'Pinboard-{}.json'.format(datetime.date.today())
-		pinboard = self.connect()
-		self.write(filename, json.dumps(pinboard.json()))
+    def do_backup(self):
+        #do stuff
+        filename = 'Pinboard-{}.json'.format(datetime.date.today())
+        pinboard = self.connect()
+        self.write(filename, json.dumps(pinboard.json()))
 
-	def connect(self):
+    def connect(self):
 
-		auth_token = self.token
-		params     = {'format': 'json', 'auth_token': auth_token}
+        auth_token = self.token
+        params     = {'format': 'json', 'auth_token': auth_token}
 
-		response = requests.get(Pinboard.url, params = params, stream=True, verify=True)
+        response = requests.get(Pinboard.url, params = params, stream=True, verify=True)
 
-		response.raise_for_status()		#Throw error if response is not 200
+        response.raise_for_status()     #Throw error if response is not 200
 
-		return response
+        return response

@@ -18,13 +18,19 @@
 
 class AbstractService(object):
 
-	def do_backup(self):
-		raise NotImplementedError()
+    def do_backup(self):
+        raise NotImplementedError()
 
-	def write(self, filename, data, append=False):
-		mode = 'w'
-		if append:
-			mode = 'a'
+    def write(self, filename, data, append=False):
+        mode = 'w'
+        if append:
+            mode = 'a'
 
-		with open(filename, mode) as fd:
-			fd.write(data)
+        with open(filename, mode) as fd:
+            fd.write(data)
+
+    @classmethod
+    def list_services(cls):
+        """List all the services we know about"""
+        for clss in cls.__subclasses__():
+            yield clss.__name__, clss
