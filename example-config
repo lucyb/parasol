@@ -9,8 +9,8 @@ url=
 [Trello]
 key=
 token=
-url=
+url=https://api.trello.com/
 
 [Pinboard]
 token=
-url=
+url=https://api.pinboard.in/v1/

@@ -31,10 +31,12 @@ class BackupServices(object):
         #module that are a subclass of AbstractService
         all_services = AbstractService.list_services()
         for name, service in all_services:
-            click.echo(name)
-            service('')
+            click.echo('Backing up ' + name)
+            service_config = self.read_config('config.ini', name)
+            s = service(service_config)
+            s.do_backup()
 
-    def readConfig(self, config_file, serviceName):
+    def read_config(self, config_file, service_name):
         config = configparser.ConfigParser()
         config.read(config_file)
         return config[service_name]
