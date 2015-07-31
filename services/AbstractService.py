@@ -16,10 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-class AbstractService(object):
+import abc
 
+class AbstractService(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def do_backup(self):
-        raise NotImplementedError()
+        """Run the backup for the service"""
 
     def write(self, filename, data, append=False):
         mode = 'w'
