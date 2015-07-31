@@ -25,8 +25,11 @@ import json
 class Trello(AbstractService):
     """All your organisation with everyone"""
 
+    url = 'https://api.trello.com/'
+
     def __init__(self, config):
-        self.url   = config['url']
+        if 'url' in config:
+            self.url   = config['url']
         self.key   = config['key']
         self.token = config['token']
 
