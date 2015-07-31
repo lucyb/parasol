@@ -24,12 +24,11 @@ import json
 class Pinboard(AbstractService):
     """All of your bookmarks"""
 
-    url = 'https://api.pinboard.in/v1/'
+    default_url = 'https://api.pinboard.in/v1/'
 
     def __init__(self, config):
-        if 'url' in config:
-            self.url   = config['url']
-        self.token = config['token']
+        self.url   = config.get('url', self.default_url)
+        self.token = config.get('token')
 
     def do_backup(self):
         filename = 'Pinboard-{}.json'.format(datetime.date.today())

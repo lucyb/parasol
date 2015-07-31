@@ -23,12 +23,11 @@ import requests
 class Evernote(AbstractService):
     '''All of your notes'''
 
-    url = 'https://api.evernote.com/'
+    default_url = 'https://api.evernote.com/'
 
     def __init__(self, config):
-        if 'url' in config:
-            self.url   = config['url']
-        self.token = config['token']
+        self.url   = config.get('url', default_url)
+        self.token = config.get('token')
 
     def do_backup(self):
         raise NotImplementedException()

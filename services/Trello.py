@@ -25,13 +25,12 @@ import json
 class Trello(AbstractService):
     """All your organisation with everyone"""
 
-    url = 'https://api.trello.com/'
+    default_url = 'https://api.trello.com/'
 
     def __init__(self, config):
-        if 'url' in config:
-            self.url   = config['url']
-        self.key   = config['key']
-        self.token = config['token']
+        self.url   = config.get('url', self.default_url)
+        self.key   = config.get('key')
+        self.token = config.get('token')
 
     def do_backup(self):
         #For each board, fetch all data and write the json to a file
