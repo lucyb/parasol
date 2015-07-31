@@ -35,7 +35,7 @@ class BackupServices(object):
         self.run_backups(all_services, config_settings)
 
     def run_backups(self, all_services, config_settings):
-        '''Run the backup for each service specified in the config files provided'''
+        """Run the backup for each service specified in the config files provided"""
         for section in config_settings.sections():
             service_config = config_settings[section]
             service_name   = BackupServices.get_service_name(config_settings, section)
@@ -49,7 +49,7 @@ class BackupServices(object):
 
     @staticmethod
     def run_backup(service_name, service_class, service_config):
-        '''Run the backup for the service provided by service_class and with the configuration settings in service_config'''
+        """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
         click.echo('Backing up ' + service_name)
         service = service_class(service_config)
         service.do_backup()
@@ -69,7 +69,7 @@ class BackupServices(object):
 
     @staticmethod
     def read_config(config_file):
-        '''Use ConfigParser to read in the configuration file from the path specified by config_file'''
+        """Use ConfigParser to read in the configuration file from the path specified by config_file"""
         config = configparser.ConfigParser()
         config.read(config_file)
         return config
