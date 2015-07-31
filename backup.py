@@ -27,12 +27,19 @@ import configparser
 class BackupServices(object):
 
     def __init__(self, services, config):
-        #if services is empty, then fetch all classes in the services
-        #module that are a subclass of AbstractService
-        all_services = {s[0]: s[1] for s in AbstractService.list_services()}
+        #Fetch available services
+        all_services    = {s[0]: s[1] for s in AbstractService.list_services()}
+        #Get config options
         config_settings = BackupServices.read_config(config)
-        for service_name in config_settings.sections():
-            service_config = config_settings[service_name]
+        #Run the backups
+        self.run_backups(all_services, config_settings)
+
+    def run_backups(self, all_services, config_settings):
+        '''Run the backup for each service specified in the config files provided'''
+        for section in config_settings.sections():
+            service_config = config_settings[section]
+            service_name   = BackupServices.get_service_name(config_settings, section)
+
             try:
                 service_class = BackupServices.fetch_service(all_services, service_name)
                 BackupServices.run_backup(service_name, service_class, service_config)
@@ -42,9 +49,16 @@ class BackupServices(object):
 
     @staticmethod
     def run_backup(service_name, service_class, service_config):
+        '''Run the backup for the service provided by service_class and with the configuration settings in service_config'''
         click.echo('Backing up ' + service_name)
         service = service_class(service_config)
         service.do_backup()
+
+    @staticmethod
+    def get_service_name(config_settings, section):
+        if 'service' in config_settings[section]:
+            return config_settings[section]['service']
+        return section
 
     @staticmethod
     def fetch_service(all_services, service_name):
@@ -55,6 +69,7 @@ class BackupServices(object):
 
     @staticmethod
     def read_config(config_file):
+        '''Use ConfigParser to read in the configuration file from the path specified by config_file'''
         config = configparser.ConfigParser()
         config.read(config_file)
         return config
