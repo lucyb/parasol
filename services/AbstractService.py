@@ -32,9 +32,3 @@ class AbstractService(object):
 
         with open(filename, mode) as fd:
             fd.write(data)
-
-    @classmethod
-    def list_services(cls):
-        """List all the services we know about"""
-        for clss in cls.__subclasses__():
-            yield clss.__name__, clss

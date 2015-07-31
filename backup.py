@@ -18,27 +18,29 @@
 
 import click
 from services import *
+from ServiceRegistry import ServiceRegistry, ServiceNotFoundException
 import inspect
 import configparser
 
 class BackupServices(object):
 
     def __init__(self, services, config):
-        #Fetch available services
-        all_services    = {s[0]: s[1] for s in AbstractService.list_services()}
+        #Find available services
+        self.service_registry = ServiceRegistry()
+        self.service_registry.load_services(AbstractService)
         #Get config options
-        config_settings = BackupServices.read_config(config)
+        self.config_settings  = BackupServices.read_config(config)
         #Run the backups
-        self.run_backups(all_services, config_settings)
+        self.run_backups(services)
 
-    def run_backups(self, all_services, config_settings):
+    def run_backups(self, services):
         """Run the backup for each service specified in the config files provided"""
-        for section in config_settings.sections():
-            service_config = config_settings[section]
-            service_name   = BackupServices.get_service_name(config_settings, section)
+        for section in self.config_settings.sections():
+            service_config = self.config_settings[section]
+            service_name   = self.get_service_name(section)
 
             try:
-                service_class = BackupServices.fetch_service(all_services, service_name)
+                service_class = self.service_registry.get_service(service_name)
                 BackupServices.run_backup(service_name, service_class, service_config)
             except ServiceNotFoundException:
                 click.echo('Found config section for {} but no matching service. Skipping'.format(service_name))
@@ -51,18 +53,10 @@ class BackupServices(object):
         service = service_class(service_config)
         service.do_backup()
 
-    @staticmethod
-    def get_service_name(config_settings, section):
-        if 'service' in config_settings[section]:
-            return config_settings[section]['service']
+    def get_service_name(self, section):
+        if 'service' in self.config_settings[section]:
+            return self.config_settings[section]['service']
         return section
-
-    @staticmethod
-    def fetch_service(all_services, service_name):
-        if service_name in all_services:
-            return all_services[service_name]
-
-        raise ServiceNotFoundException('Service class for {} not found'.format(service_name))
 
     @staticmethod
     def read_config(config_file):
@@ -70,8 +64,6 @@ class BackupServices(object):
         config = configparser.ConfigParser()
         config.read(config_file)
         return config
-
-class ServiceNotFoundException(Exception): pass
 
 # List services callback
 #
@@ -88,7 +80,8 @@ def list_services(ctx, param, value):
         return
 
     # iterate over the services list, printing names and the docstrings
-    for name, service in AbstractService.list_services():
+    service_registry = ServiceRegistry()
+    for name, service in service_registry.load_services(AbstractService).items():
         click.echo("{} - {}".format(name, inspect.getdoc(service)))
 
     # exit with status 0
