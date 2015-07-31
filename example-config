@@ -1,4 +1,4 @@
-[DEFAULT]
+[Backup]
 default_backup_location=
 tmp_location=
 

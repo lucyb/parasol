@@ -61,7 +61,7 @@ class BackupServices(object):
     @staticmethod
     def read_config(config_file):
         """Use ConfigParser to read in the configuration file from the path specified by config_file"""
-        config = configparser.ConfigParser()
+        config = configparser.ConfigParser(default_section='Backup')
         config.read(config_file)
         return config
 
