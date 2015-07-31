@@ -43,6 +43,7 @@ class Pinboard(AbstractService):
 
         response = requests.get(self.url + path, params = params, stream=True, verify=True)
 
-        response.raise_for_status()     #Throw error if response is not 200
+        #Throw error if response is not 200
+        response.raise_for_status()
 
         return response

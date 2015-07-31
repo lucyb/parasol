@@ -15,6 +15,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+from services.AbstractService import AbstractService
 import os.path as ops
 import os
 import stat
@@ -23,6 +25,7 @@ import click
 
 
 class MobilePhotos(AbstractService):
+    """All the photos from your mobile phone"""
 
     def __init__(self, backup_location, host, remote_path, username=None, port=22, password=None):
         self.backup_location = ops.expandvars(ops.expanduser(backup_location))
@@ -32,7 +35,7 @@ class MobilePhotos(AbstractService):
         self.username        = username
         self.password        = password
 
-    def doBackup(self):
+    def do_backup(self):
         # connect with the client
         self.client = self.connect()
 

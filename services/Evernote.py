@@ -35,7 +35,7 @@ class Evernote(AbstractService):
 
     def connect(self):
         auth_token = self.token
-        path       = 'posts/all'
+        path       = ''
         params     = {'format': 'json', 'auth_token': auth_token}
 
         response = requests.get(self.url + path, params = params, stream=True, verify=True)
