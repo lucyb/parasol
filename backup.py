@@ -17,10 +17,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 import click
-import services
-from services.AbstractService import AbstractService
-from services.Pinboard import Pinboard
-from services.Trello import Trello
+from services import *
 import inspect
 import configparser
 
@@ -45,7 +42,7 @@ class BackupServices(object):
                 BackupServices.run_backup(service_name, service_class, service_config)
             except ServiceNotFoundException:
                 click.echo('Found config section for {} but no matching service. Skipping'.format(service_name))
-                continue
+                pass
 
     @staticmethod
     def run_backup(service_name, service_class, service_config):
