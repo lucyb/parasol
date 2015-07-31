@@ -29,17 +29,37 @@ class BackupServices(object):
     def __init__(self, services, config):
         #if services is empty, then fetch all classes in the services
         #module that are a subclass of AbstractService
-        all_services = AbstractService.list_services()
-        for name, service in all_services:
-            click.echo('Backing up ' + name)
-            service_config = self.read_config('config.ini', name)
-            s = service(service_config)
-            s.do_backup()
+        all_services = {s[0]: s[1] for s in AbstractService.list_services()}
+        config_settings = BackupServices.read_config(config)
+        for service_name in config_settings.sections():
+            service_config = config_settings[service_name]
+            try:
+                service_class = BackupServices.fetch_service(all_services, service_name)
+                BackupServices.run_backup(service_name, service_class, service_config)
+            except ServiceNotFoundException:
+                click.echo('Found config section for {} but no matching service. Skipping'.format(service_name))
+                continue
 
-    def read_config(self, config_file, service_name):
+    @staticmethod
+    def run_backup(service_name, service_class, service_config):
+        click.echo('Backing up ' + service_name)
+        service = service_class(service_config)
+        service.do_backup()
+
+    @staticmethod
+    def fetch_service(all_services, service_name):
+        if service_name in all_services:
+            return all_services[service_name]
+
+        raise ServiceNotFoundException('Service class for {} not found'.format(service_name))
+
+    @staticmethod
+    def read_config(config_file):
         config = configparser.ConfigParser()
         config.read(config_file)
-        return config[service_name]
+        return config
+
+class ServiceNotFoundException(Exception): pass
 
 # List services callback
 #
