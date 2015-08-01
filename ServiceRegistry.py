@@ -37,8 +37,8 @@ class ServiceRegistry(object):
         """Add a service to the dict of known services"""
         self.services[service_name] = service_class
 
-    def get_all(self):
-        return self.services
+    def items(self):
+        return self.services.items()
 
     def get(self, service_name):
         """Return the concrete service having the name specified in service_name"""
