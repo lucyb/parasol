@@ -26,11 +26,11 @@ class Evernote(AbstractService):
     default_url = 'https://api.evernote.com/'
 
     def __init__(self, config):
-        self.url   = config.get('url', default_url)
+        self.url   = config.get('url', self.default_url)
         self.token = config.get('token')
 
     def do_backup(self):
-        raise NotImplementedException()
+        raise NotImplementedError()
 
     def connect(self):
         auth_token = self.token
