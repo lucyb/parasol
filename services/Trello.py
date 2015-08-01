@@ -25,7 +25,7 @@ import json
 class Trello(AbstractService):
     """All your organisation with everyone"""
 
-    default_url = 'https://api.trello.com/'
+    default_url = 'https://api.trello.com/1/'
 
     def __init__(self, config):
         self.url   = config.get('url', self.default_url)
@@ -48,7 +48,7 @@ class Trello(AbstractService):
 
 
     def boards_to_backup(self):
-        boards = self.connect('1/members/me/boards')
+        boards = self.connect('members/me/boards')
         board_dict = {}
         for boardJson in boards.json():
             board_dict[boardJson['id']] = boardJson['name']
@@ -58,20 +58,20 @@ class Trello(AbstractService):
     def write_board_data(self, board_id, board_name):
         filename = 'Trello-{0}-{1}.json'.format(board_name, str(datetime.date.today()));
 
-        board_url = '1/boards/' + board_id
+        board_url = 'boards/' + board_id
 
         board_info = {}
 
         board = self.connect(board_url)
-        board_info['board'] = board
+        board_info['board'] = board.json()
 
         lists = self.connect(board_url + '/lists')
-        board_info['lists'] = lists
+        board_info['lists'] = lists.json()
 
         cards = self.connect(board_url + '/cards')
-        board_info['cards'] = cards
+        board_info['cards'] = cards.json()
 
         checklists = self.connect(board_url + '/checklists')
-        board_info['checklists'] = checklists
+        board_info['checklists'] = checklists.json()
 
-        self.write(filename, json.dumps(board_info))
+        self.write(filename, json.JSONEncoder().encode(board_info))
