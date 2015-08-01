@@ -21,6 +21,7 @@ from services import *
 from ServiceRegistry import ServiceRegistry, ServiceNotFoundException
 import inspect
 import configparser
+import sys
 
 class BackupServices(object):
 
@@ -34,15 +35,17 @@ class BackupServices(object):
 
     def run_backups(self, services):
         """Run the backup for each service specified in the config files provided"""
-        for section in self.config_settings.sections():
-            service_config = self.config_settings[section]
-            service_name   = self.get_service_name(section)
-
+        for service_name, service_config in self.services_to_run(services):
             try:
                 service_class = self.service_registry.get(service_name)
                 BackupServices.run_backup(service_name, service_class, service_config)
             except ServiceNotFoundException:
                 click.echo('Found config section for {} but no matching service. Skipping'.format(service_name))
+                pass
+            except:
+                click.echo(sys.exc_info())
+                #Continue so that the next backup can be run
+                #A problem with one service should not stop us from backing up the rest!
                 pass
 
     @staticmethod
@@ -51,6 +54,16 @@ class BackupServices(object):
         click.echo('Backing up ' + service_name)
         service = service_class(service_config)
         service.do_backup()
+
+    def services_to_run(self, services):
+        """Return the name and config details for each service to run"""
+        for section in self.config_settings.sections():
+            service_name = self.get_service_name(section)
+            #Only return services if certain services have been specified or return all
+            #services if none have been specified
+            if not services or service_name in services:
+                service_config = self.config_settings[section]
+                yield service_name, service_config
 
     def get_service_name(self, section):
         if 'service' in self.config_settings[section]:
