@@ -26,8 +26,7 @@ class BackupServices(object):
 
     def __init__(self, services, config):
         #Find available services
-        self.service_registry = ServiceRegistry()
-        self.service_registry.load_services(AbstractService)
+        self.service_registry = ServiceRegistry(AbstractService)
         #Get config options
         self.config_settings  = BackupServices.read_config(config)
         #Run the backups
@@ -40,7 +39,7 @@ class BackupServices(object):
             service_name   = self.get_service_name(section)
 
             try:
-                service_class = self.service_registry.get_service(service_name)
+                service_class = self.service_registry.get(service_name)
                 BackupServices.run_backup(service_name, service_class, service_config)
             except ServiceNotFoundException:
                 click.echo('Found config section for {} but no matching service. Skipping'.format(service_name))
@@ -80,8 +79,8 @@ def list_services(ctx, param, value):
         return
 
     # iterate over the services list, printing names and the docstrings
-    service_registry = ServiceRegistry()
-    for name, service in service_registry.load_services(AbstractService).items():
+    service_registry = ServiceRegistry(AbstractService)
+    for name, service in service_registry.get_all().items():
         click.echo("{} - {}".format(name, inspect.getdoc(service)))
 
     # exit with status 0

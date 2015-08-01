@@ -21,25 +21,35 @@ from services import *
 class ServiceRegistry(object):
     """A registry of all known backup services"""
 
-    def __init__(self):
+    def __init__(self, service_type):
+        """Create a ServiceRegistry instance and load all known subclasses of
+           service_type"""
         self.services = {}
+        self.load_all(service_type)
 
-    def load_services(self, service_type):
+    def load_all(self, service_type):
         """Locate all services that implement the class provided by service_type
            and add to the dict of known services.
            Return the dict of services"""
         for concrete_service in service_type.__subclasses__():
-            self.load_service(concrete_service.__name__, concrete_service)
+            self.load(concrete_service.__name__, concrete_service)
         return self.services
 
-    def load_service(self, service_name, service_class):
+    def load(self, service_name, service_class):
         """Add a service to the dict of known services"""
         self.services[service_name] = service_class
 
-    def get_service(self, service_name):
+    def get_all(self):
+        return self.services
+
+    def get(self, service_name):
         """Return the concrete service having the name specified in service_name"""
         if service_name in self.services:
             return self.services[service_name]
         raise ServiceNotFoundException('Service class for {} not found'.format(service_name))
+
+    def __getitem__(self, service_name):
+        """Return the concrete service having the name specified in service_name"""
+        return self.get(service_name)
 
 class ServiceNotFoundException(Exception): pass
