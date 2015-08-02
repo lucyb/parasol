@@ -16,17 +16,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from services.AbstractService import AbstractService
+from parasol.services.AbstractService import AbstractService
+import datetime
+import requests
 
-class Mobile(AbstractService):
-    """Application and settings data from your mobile phone"""
+class Evernote(AbstractService):
+    '''All of your notes'''
+
+    default_url = 'https://api.evernote.com/'
 
     def __init__(self, config):
-        raise NotImplementedError
+        self.url   = config.get('url', self.default_url)
+        self.token = config['token']
 
     def do_backup(self):
-        raise NotImplementedError
-		#backup clue data
-		#backup weight data
-		#backup notes
-		#backup settings?
+        raise NotImplementedError()
+
+    def connect(self):
+        auth_token = self.token
+        path       = ''
+        params     = {'format': 'json', 'auth_token': auth_token}
+
+        response = requests.get(self.url + path, params = params, stream=True, verify=True)
+
+        #Throw error if response is not 200
+        response.raise_for_status()
+
+        return response

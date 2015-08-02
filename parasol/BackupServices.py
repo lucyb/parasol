@@ -15,19 +15,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
+from parasol.services import *
+from parasol.ServiceRegistry import ServiceRegistry, ServiceNotFoundException
 
 import click
-from services import *
-from ServiceRegistry import ServiceRegistry, ServiceNotFoundException
-import inspect
 import configparser
 import sys
 
 class BackupServices(object):
 
+    __service_registry__ = None
+
     def __init__(self, services, config):
-        #Find available services
-        self.service_registry = ServiceRegistry(AbstractService)
         #Get config options
         self.config_settings  = BackupServices.read_config(config)
         #Populate the list of services, if required
@@ -40,7 +39,7 @@ class BackupServices(object):
 
         for service_name, service_config in self.services_to_run():
             try:
-                service_class = self.service_registry.get(service_name)
+                service_class = self.service_registry().get(service_name)
                 BackupServices.run_backup(service_name, service_class, service_config)
             except ServiceNotFoundException:
                 click.echo('Found config section for {} but no matching service. Skipping'.format(service_name))
@@ -50,13 +49,6 @@ class BackupServices(object):
                 #Continue so that the next backup can be run
                 #A problem with one service should not stop us from backing up the rest!
                 pass
-
-    @staticmethod
-    def run_backup(service_name, service_class, service_config):
-        """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
-        click.echo('Backing up ' + service_name)
-        service = service_class(service_config)
-        service.do_backup()
 
     def populate_services(self, services):
         """Return the list of services"""
@@ -80,6 +72,13 @@ class BackupServices(object):
             return self.config_settings[section]['service']
         return section
 
+    @classmethod
+    def service_registry(cls):
+        """Return a service registry to use"""
+        if cls.__service_registry__ is None:
+            cls.__service_registry__ = ServiceRegistry(AbstractService)
+        return cls.__service_registry__
+
     @staticmethod
     def read_config(config_file):
         """Use ConfigParser to read in the configuration file from the path specified by config_file"""
@@ -87,39 +86,9 @@ class BackupServices(object):
         config.read(config_file)
         return config
 
-# List services callback
-#
-# This uses a callback to interupt the usual argument handling
-# http://click.pocoo.org/4/options/#callbacks-and-eager-options
-#
-# ctx is the script execution context, which in this case we use to exit the
-# program (And also check for resiliant parsing, in which case we shouldn't
-# exit.
-def list_services(ctx, param, value):
-    """Callback used for the --list commandline flag, which returns a list of the services the program can potentially back up"""
-    # If we weren't called with a value (not sure how this can happen) or we're in the resiliant parsing / no errors mode give up now.
-    if not value or ctx.resilient_parsing:
-        return
-
-    # iterate over the services list, printing names and the docstrings
-    service_registry = ServiceRegistry(AbstractService)
-    for name, service in service_registry.items():
-        click.echo("{} - {}".format(name, inspect.getdoc(service)))
-
-    # exit with status 0
-    ctx.exit(0)
-
-@click.command()
-@click.argument('services', nargs=-1)
-@click.option('--list', help         = 'List services we know how to back up',
-                        is_flag      = True,
-                        callback     = list_services,
-                        expose_value = False,
-                        is_eager     = True)
-@click.option('--config', help='Specify location of the config file',
-                         default='config.ini')
-def run(services, config):
-	backupStuff = BackupServices(services, config)
-
-if __name__ == '__main__':
-    run()
+    @staticmethod
+    def run_backup(service_name, service_class, service_config):
+        """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
+        click.echo('Backing up ' + service_name)
+        service = service_class(service_config)
+        service.do_backup()

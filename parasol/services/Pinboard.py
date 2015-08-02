@@ -16,25 +16,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from services.AbstractService import AbstractService
+from parasol.services.AbstractService import AbstractService
 import datetime
 import requests
+import json
 
-class Evernote(AbstractService):
-    '''All of your notes'''
+class Pinboard(AbstractService):
+    """All of your bookmarks"""
 
-    default_url = 'https://api.evernote.com/'
+    default_url = 'https://api.pinboard.in/v1/'
 
     def __init__(self, config):
         self.url   = config.get('url', self.default_url)
         self.token = config['token']
 
     def do_backup(self):
-        raise NotImplementedError()
+        filename = 'Pinboard-{}.json'.format(datetime.date.today())
+        pinboard = self.connect()
+        self.write(filename, json.dumps(pinboard.json()))
 
     def connect(self):
         auth_token = self.token
-        path       = ''
+        path       = 'posts/all'
         params     = {'format': 'json', 'auth_token': auth_token}
 
         response = requests.get(self.url + path, params = params, stream=True, verify=True)

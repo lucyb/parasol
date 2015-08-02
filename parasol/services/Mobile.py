@@ -16,32 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from services.AbstractService import AbstractService
+from parasol.services.AbstractService import AbstractService
 
-class Flickr(AbstractService):
-    """All of your photos"""
-
-    url = 'https://'
+class Mobile(AbstractService):
+    """Application and settings data from your mobile phone"""
 
     def __init__(self, config):
-        if 'url' in config:
-            self.url   = config['url']
-        self.token = config['token']
+        raise NotImplementedError
 
     def do_backup(self):
-        filename = 'Flickr-{}.json'.format(datetime.date.today())
-        flickr = self.connect()
-        self.write(filename, json.dumps(flickr.json()))
-
-    def connect(self):
-        auth_token = self.token
-        path       = ''
-        params     = {'format': 'json', 'auth_token': auth_token}
-
-        response = requests.get(self.url + path, params = params, stream=True, verify=True)
-
-        #Throw error if response is not 200
-        response.raise_for_status()
-
-        return response
-
+        raise NotImplementedError
+		#backup clue data
+		#backup weight data
+		#backup notes
+		#backup settings?
