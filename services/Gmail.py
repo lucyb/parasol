@@ -16,10 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from services.AbstractService import AbstractService
+
 class Gmail(AbstractService):
+    """All of your email"""
 
-	def __init__(self):
-		#Required?
+    url = ""
 
-	def doBackup(self):
-		#do stuff
+    def __init__(self, config):
+        raise NotImplementedError
+
+    def do_backup(self):
+        raise NotImplementedError

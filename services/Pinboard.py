@@ -24,24 +24,25 @@ import json
 class Pinboard(AbstractService):
     """All of your bookmarks"""
 
-    url = 'https://api.pinboard.in/v1/posts/all'
+    default_url = 'https://api.pinboard.in/v1/'
 
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, config):
+        self.url   = config.get('url', self.default_url)
+        self.token = config['token']
 
     def do_backup(self):
-        #do stuff
         filename = 'Pinboard-{}.json'.format(datetime.date.today())
         pinboard = self.connect()
         self.write(filename, json.dumps(pinboard.json()))
 
     def connect(self):
-
         auth_token = self.token
+        path       = 'posts/all'
         params     = {'format': 'json', 'auth_token': auth_token}
 
-        response = requests.get(Pinboard.url, params = params, stream=True, verify=True)
+        response = requests.get(self.url + path, params = params, stream=True, verify=True)
 
-        response.raise_for_status()     #Throw error if response is not 200
+        #Throw error if response is not 200
+        response.raise_for_status()
 
         return response

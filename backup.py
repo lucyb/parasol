@@ -17,22 +17,75 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 import click
-import services
-from services.AbstractService import AbstractService
-from services.Pinboard import Pinboard
-from services.Trello import Trello
+from services import *
+from ServiceRegistry import ServiceRegistry, ServiceNotFoundException
 import inspect
+import configparser
+import sys
 
 class BackupServices(object):
 
-    def __init__(self, services):
-        #if services is empty, then fetch all classes in the services
-        #module that are a subclass of AbstractService
-        all_services = AbstractService.list_services()
-        for name, service in all_services:
-            click.echo(name)
-            service('')
+    def __init__(self, services, config):
+        #Find available services
+        self.service_registry = ServiceRegistry(AbstractService)
+        #Get config options
+        self.config_settings  = BackupServices.read_config(config)
+        #Populate the list of services, if required
+        self.services = self.populate_services(services)
+        #Run the backups
+        self.run_backups()
 
+    def run_backups(self):
+        """Run the backup for each service specified in the config files provided"""
+
+        for service_name, service_config in self.services_to_run():
+            try:
+                service_class = self.service_registry.get(service_name)
+                BackupServices.run_backup(service_name, service_class, service_config)
+            except ServiceNotFoundException:
+                click.echo('Found config section for {} but no matching service. Skipping'.format(service_name))
+                pass
+            except:
+                click.echo(sys.exc_info())
+                #Continue so that the next backup can be run
+                #A problem with one service should not stop us from backing up the rest!
+                pass
+
+    @staticmethod
+    def run_backup(service_name, service_class, service_config):
+        """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
+        click.echo('Backing up ' + service_name)
+        service = service_class(service_config)
+        service.do_backup()
+
+    def populate_services(self, services):
+        """Return the list of services"""
+        if not services:
+            services = self.config_settings.sections()
+        return services
+
+    def services_to_run(self):
+        """Return the name and config details for each service to run"""
+        for section in self.config_settings.sections():
+            service_name = self.get_service_name(section)
+
+            #Return config details for each service that we care about 
+            if service_name in self.services:
+                service_config = self.config_settings[section]
+                yield service_name, service_config
+
+    def get_service_name(self, section):
+        """Return the name of the service in this section of the config"""
+        if 'service' in self.config_settings[section]:
+            return self.config_settings[section]['service']
+        return section
+
+    @staticmethod
+    def read_config(config_file):
+        """Use ConfigParser to read in the configuration file from the path specified by config_file"""
+        config = configparser.ConfigParser(default_section='Backup')
+        config.read(config_file)
+        return config
 
 # List services callback
 #
@@ -49,7 +102,8 @@ def list_services(ctx, param, value):
         return
 
     # iterate over the services list, printing names and the docstrings
-    for name, service in AbstractService.list_services():
+    service_registry = ServiceRegistry(AbstractService)
+    for name, service in service_registry.items():
         click.echo("{} - {}".format(name, inspect.getdoc(service)))
 
     # exit with status 0
@@ -62,8 +116,10 @@ def list_services(ctx, param, value):
                         callback     = list_services,
                         expose_value = False,
                         is_eager     = True)
-def run(services):
-    backupStuff = BackupServices(services)
+@click.option('--config', help='Specify location of the config file',
+                         default='config.ini')
+def run(services, config):
+	backupStuff = BackupServices(services, config)
 
 if __name__ == '__main__':
     run()
