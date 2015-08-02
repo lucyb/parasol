@@ -25,9 +25,9 @@ import sys
 
 class BackupServices(object):
 
+    __service_registry__ = None
+
     def __init__(self, services, config):
-        #Find available services
-        self.service_registry = BackupServices.service_registry()
         #Get config options
         self.config_settings  = BackupServices.read_config(config)
         #Populate the list of services, if required
@@ -40,7 +40,7 @@ class BackupServices(object):
 
         for service_name, service_config in self.services_to_run():
             try:
-                service_class = self.service_registry.get(service_name)
+                service_class = self.service_registry().get(service_name)
                 BackupServices.run_backup(service_name, service_class, service_config)
             except ServiceNotFoundException:
                 click.echo('Found config section for {} but no matching service. Skipping'.format(service_name))
@@ -80,6 +80,12 @@ class BackupServices(object):
             return self.config_settings[section]['service']
         return section
 
+    @classmethod
+    def service_registry(cls):
+        """Return a service registry to use"""
+        if cls.__service_registry__ is None:
+            cls.__service_registry__ = ServiceRegistry(AbstractService)
+        return cls.__service_registry__
 
     @staticmethod
     def read_config(config_file):
