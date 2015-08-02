@@ -51,13 +51,6 @@ class BackupServices(object):
                 #A problem with one service should not stop us from backing up the rest!
                 pass
 
-    @staticmethod
-    def run_backup(service_name, service_class, service_config):
-        """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
-        click.echo('Backing up ' + service_name)
-        service = service_class(service_config)
-        service.do_backup()
-
     def populate_services(self, services):
         """Return the list of services"""
         if not services:
@@ -95,6 +88,8 @@ class BackupServices(object):
         return config
 
     @staticmethod
-    def service_registry():
-        """Return a service registry to use"""
-        return ServiceRegistry(AbstractService)
+    def run_backup(service_name, service_class, service_config):
+        """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
+        click.echo('Backing up ' + service_name)
+        service = service_class(service_config)
+        service.do_backup()
