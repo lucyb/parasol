@@ -41,7 +41,7 @@ class MobilePhotos(AbstractService):
             sftp.chdir(self.remote_path)
 
             # recurse from there, looking for photos
-            for filename in find_all(sftp, '.'):
+            for filename in MobilePhotos.find_all(sftp, '.'):
                 self.backup_file(sftp, filename)
 
     def backup_file(self, sftp, filename):
@@ -98,7 +98,7 @@ class MobilePhotos(AbstractService):
                 yield path
             else: # path is a dir
                 try: # so we recurse!
-                    for found_path in find_all(sftp, path):
+                    for found_path in MobilePhotos.find_all(sftp, path):
                         yield found_path
                 except EnvironmentError:
                     pass # ignore errors
