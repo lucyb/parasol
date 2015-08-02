@@ -19,11 +19,6 @@ from parasol.BackupServices import BackupServices
 
 import click
 import inspect
-import configparser
-import sys
-import traceback
-
-
 
 # List services callback
 #
