@@ -22,7 +22,7 @@ import os
 import stat
 import paramiko
 import click
-
+from contextlib import contextmanager
 
 class MobilePhotos(AbstractService):
     """All the photos from your mobile phone"""
@@ -36,20 +36,15 @@ class MobilePhotos(AbstractService):
         self.password        = password
 
     def do_backup(self):
-        # connect with the client
-        self.client = self.connect()
+        with self.connect() as sftp:
+            # change to the mobile location
+            sftp.chdir(self.remote_path)
 
-        # open up sftp
-        self.sftp   = self.client.open_sftp()
+            # recurse from there, looking for photos
+            for filename in find_all(sftp, '.'):
+                self.backup_file(sftp, filename)
 
-        # change to the mobile location
-        self.sftp.chdir(self.remote_path)
-
-        # recurse from there, looking for photos
-        for filename in self.find_all('.'):
-            self.backup_file(filename)
-
-    def backup_file(self, filename):
+    def backup_file(self, sftp, filename):
         """Backup one file via sftp"""
         # figure out where the file would be, if we already had it
         local = ops.abspath(ops.join(self.backup_location, filename))
@@ -66,25 +61,34 @@ class MobilePhotos(AbstractService):
                 os.mkdir(directory)
 
             # fetch it!
-            self.sftp.get(filename, local)
+            sftp.get(filename, local)
 
+    @contextmanager
     def connect(self):
         # make a client
         client = paramiko.SSHClient()
 
-        # load up user's host keys
-        client.load_system_host_keys()
+        try:
+            # load up user's host keys
+            client.load_system_host_keys()
 
-        # try and connect
-        client.connect(self.host, self.port, username = self.username, password = self.password)
+            # Try and connect, using the supplied password or SSH agent
+            client.connect(self.host, self.port, username = self.username, password = self.password)
+
+            sftp = client.open_sftp()
+
+            yield sftp
+        finally:
+            client.close()
 
         return client
 
     # recurse while yielding results
     # modified from https://stackoverflow.com/questions/13205875/add-an-item-into-a-list-recursively
-    def find_all(self, directory):
+    @staticmethod
+    def find_all(sftp, directory):
         # loop over the directory, getting the atributes
-        for item in self.sftp.listdir_attr(directory):
+        for item in sftp.listdir_attr(directory):
             # use join on the string, not os.path join to avoid possible cross-platform issues
             # though this assumes the server is running linux.
             path = '/'.join([directory, item.filename])
@@ -94,7 +98,7 @@ class MobilePhotos(AbstractService):
                 yield path
             else: # path is a dir
                 try: # so we recurse!
-                    for found_path in self.find_all(path):
+                    for found_path in find_all(sftp, path):
                         yield found_path
                 except EnvironmentError:
                     pass # ignore errors
