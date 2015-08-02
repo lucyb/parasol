@@ -30,12 +30,15 @@ class BackupServices(object):
         self.service_registry = ServiceRegistry(AbstractService)
         #Get config options
         self.config_settings  = BackupServices.read_config(config)
+        #Populate the list of services, if required
+        self.services = self.populate_services(services)
         #Run the backups
-        self.run_backups(services)
+        self.run_backups()
 
-    def run_backups(self, services):
+    def run_backups(self):
         """Run the backup for each service specified in the config files provided"""
-        for service_name, service_config in self.services_to_run(services):
+
+        for service_name, service_config in self.services_to_run():
             try:
                 service_class = self.service_registry.get(service_name)
                 BackupServices.run_backup(service_name, service_class, service_config)
@@ -55,17 +58,24 @@ class BackupServices(object):
         service = service_class(service_config)
         service.do_backup()
 
-    def services_to_run(self, services):
+    def populate_services(self, services):
+        """Return the list of services"""
+        if not services:
+            services = self.config_settings.sections()
+        return services
+
+    def services_to_run(self):
         """Return the name and config details for each service to run"""
         for section in self.config_settings.sections():
             service_name = self.get_service_name(section)
-            #Only return services if certain services have been specified or return all
-            #services if none have been specified
-            if not services or service_name in services:
+
+            #Return config details for each service that we care about 
+            if service_name in self.services:
                 service_config = self.config_settings[section]
                 yield service_name, service_config
 
     def get_service_name(self, section):
+        """Return the name of the service in this section of the config"""
         if 'service' in self.config_settings[section]:
             return self.config_settings[section]['service']
         return section
