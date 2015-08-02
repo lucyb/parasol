@@ -27,7 +27,7 @@ class BackupServices(object):
 
     def __init__(self, services, config):
         #Find available services
-        self.service_registry = self.services()
+        self.service_registry = BackupServices.service_registry()
         #Get config options
         self.config_settings  = BackupServices.read_config(config)
         #Populate the list of services, if required
@@ -80,11 +80,6 @@ class BackupServices(object):
             return self.config_settings[section]['service']
         return section
 
-    @classmethod
-    def services(cls):
-        """Return a service registry to use"""
-        return ServiceRegistry(AbstractService)
-
 
     @staticmethod
     def read_config(config_file):
@@ -93,3 +88,7 @@ class BackupServices(object):
         config.read(config_file)
         return config
 
+    @staticmethod
+    def service_registry():
+        """Return a service registry to use"""
+        return ServiceRegistry(AbstractService)
