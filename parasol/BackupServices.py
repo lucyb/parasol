@@ -19,7 +19,6 @@ from parasol.services import *
 from parasol.ServiceRegistry import ServiceRegistry, ServiceNotFoundException
 
 import click
-import inspect
 import configparser
 import sys
 
