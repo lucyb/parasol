@@ -27,13 +27,13 @@ from contextlib import contextmanager
 class MobilePhotos(AbstractService):
     """All the photos from your mobile phone"""
 
-    def __init__(self, backup_location, host, remote_path, username=None, port=22, password=None):
-        self.backup_location = ops.expandvars(ops.expanduser(backup_location))
-        self.host            = host
-        self.remote_path     = remote_path
-        self.port            = port
-        self.username        = username
-        self.password        = password
+    def __init__(self, config):
+        self.backup_location = ops.expandvars(ops.expanduser(config['backup_location']))
+        self.host            = config['host']
+        self.remote_path     = config['remote_path']
+        self.port            = int(config.get('port', 22))
+        self.username        = config.get('username')
+        self.password        = config.get('password')
 
     def do_backup(self):
         with self.connect() as sftp:
