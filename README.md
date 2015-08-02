@@ -17,7 +17,7 @@ arguments to back them all up.
 ## Usage
 
 ``` shell
-Usage: backup.py [OPTIONS] SERVICES
+Usage: parasol.py [OPTIONS] SERVICES
 
 Options:
   --help                  Show this message and exit.
