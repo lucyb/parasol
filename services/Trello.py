@@ -74,4 +74,4 @@ class Trello(AbstractService):
         checklists = self.connect(board_url + '/checklists')
         board_info['checklists'] = checklists.json()
 
-        self.write(filename, json.JSONEncoder().encode(board_info))
+        self.write(filename, json.dumps(board_info))
