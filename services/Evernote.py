@@ -27,7 +27,7 @@ class Evernote(AbstractService):
 
     def __init__(self, config):
         self.url   = config.get('url', self.default_url)
-        self.token = config.get('token')
+        self.token = config['token']
 
     def do_backup(self):
         raise NotImplementedError()

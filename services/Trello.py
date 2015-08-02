@@ -29,8 +29,8 @@ class Trello(AbstractService):
 
     def __init__(self, config):
         self.url   = config.get('url', self.default_url)
-        self.key   = config.get('key')
-        self.token = config.get('token')
+        self.key   = config['key']
+        self.token = config['token']
 
     def do_backup(self):
         #For each board, fetch all data and write the json to a file
