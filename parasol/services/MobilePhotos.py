@@ -63,8 +63,13 @@ class MobilePhotos(AbstractService):
             # fetch it!
             sftp.get(filename, local)
 
+    # The contextmanager turns a method which yields into something which can
+    # be used with a with block.  And error in the block gets re-raised at the
+    # yield statement so the finally block can fire, closing the connection
+    # down.
     @contextmanager
     def connect(self):
+        """Connect to the backup host and yield an sftp client, cleaning up after"""
         # make a client
         client = paramiko.SSHClient()
 
