@@ -47,24 +47,26 @@ class MobilePhotos(AbstractService):
 
         # recurse from there, looking for photos
         for filename in self.find_all('.'):
+            self.backup_file(filename)
 
-            # figure out where the file would be, if we already had it
-            local = ops.abspath(ops.join(self.backup_location, filename))
+    def backup_file(self, filename):
+        """Backup one file via sftp"""
+        # figure out where the file would be, if we already had it
+        local = ops.abspath(ops.join(self.backup_location, filename))
 
-            # use lexists to account for git-annex and files possibly living in a remote location.
-            if ops.lexists(local):
-                click.echo("{} ... OK!".format(local)) # yay, report and move on
-            else: # get it!
-                click.echo("{} ... fetching...".format(local))
-                directory = ops.dirname(local)
+        # use lexists to account for git-annex and files possibly living in a remote location.
+        if ops.lexists(local):
+            click.echo("{} ... OK!".format(local)) # yay, report and move on
+        else: # get it!
+            click.echo("{} ... fetching...".format(local))
+            directory = ops.dirname(local)
 
-                if not ops.isdir(directory):
-                    # make directories if we need to
-                    os.mkdir(directory)
+            if not ops.isdir(directory):
+                # make directories if we need to
+                os.mkdir(directory)
 
-                # fetch it!
-                self.sftp.get(filename, local)
-
+            # fetch it!
+            self.sftp.get(filename, local)
 
     def connect(self):
         # make a client
