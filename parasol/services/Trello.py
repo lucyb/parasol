@@ -28,6 +28,8 @@ class Trello(AbstractService):
     default_url = 'https://api.trello.com/1/'
 
     def __init__(self, config):
+        super().__init__(config)
+
         self.url   = config.get('url', self.default_url)
         self.key   = config['key']
         self.token = config['token']
@@ -57,6 +59,7 @@ class Trello(AbstractService):
 
     def write_board_data(self, board_id, board_name):
         filename = 'Trello-{0}-{1}.json'.format(board_name, str(datetime.date.today()));
+        filepath = self.backup_path(filename)
 
         board_url = 'boards/' + board_id
 
@@ -74,4 +77,4 @@ class Trello(AbstractService):
         checklists = self.connect(board_url + '/checklists')
         board_info['checklists'] = checklists.json()
 
-        self.write(filename, json.dumps(board_info))
+        self.write(filepath, json.dumps(board_info))

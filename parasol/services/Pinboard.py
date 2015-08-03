@@ -27,13 +27,17 @@ class Pinboard(AbstractService):
     default_url = 'https://api.pinboard.in/v1/'
 
     def __init__(self, config):
+        super().__init__(config)
+
         self.url   = config.get('url', self.default_url)
         self.token = config['token']
 
     def do_backup(self):
         filename = 'Pinboard-{}.json'.format(datetime.date.today())
+        filepath = self.backup_path(filename)
+
         pinboard = self.connect()
-        self.write(filename, json.dumps(pinboard.json()))
+        self.write(filepath, json.dumps(pinboard.json()))
 
     def connect(self):
         auth_token = self.token
