@@ -52,6 +52,7 @@ class BackupServices(object):
                 pass
             except:
                 click.echo(sys.exc_info())
+                raise
                 #Continue so that the next backup can be run
                 #A problem with one service should not stop us from backing up the rest!
                 pass
