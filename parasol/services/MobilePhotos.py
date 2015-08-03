@@ -22,67 +22,73 @@ import os
 import stat
 import paramiko
 import click
-
+from contextlib import contextmanager
 
 class MobilePhotos(AbstractService):
     """All the photos from your mobile phone"""
 
-    def __init__(self, backup_location, host, remote_path, username=None, port=22, password=None):
-        self.backup_location = ops.expandvars(ops.expanduser(backup_location))
-        self.host            = host
-        self.remote_path     = remote_path
-        self.port            = port
-        self.username        = username
-        self.password        = password
+    def __init__(self, config):
+        self.backup_location = ops.expandvars(ops.expanduser(config['backup_location']))
+        self.host            = config['host']
+        self.remote_path     = config['remote_path']
+        self.port            = int(config.get('port', 22))
+        self.username        = config.get('username')
+        self.password        = config.get('password')
 
     def do_backup(self):
-        # connect with the client
-        self.client = self.connect()
+        """Backup all photos on the remote path"""
+        with self.connect() as sftp:
+            sftp.chdir(self.remote_path)
 
-        # open up sftp
-        self.sftp   = self.client.open_sftp()
+            for filename in MobilePhotos.find_all(sftp, '.'):
+                self.backup_file(sftp, filename)
 
-        # change to the mobile location
-        self.sftp.chdir(self.remote_path)
+    def backup_file(self, sftp, filename):
+        """Backup one file via sftp"""
+        # figure out where the file would be, if we already had it
+        local = ops.abspath(ops.join(self.backup_location, filename))
 
-        # recurse from there, looking for photos
-        for filename in self.find_all('.'):
+        # use lexists to account for git-annex and files possibly living in a remote location.
+        if ops.lexists(local):
+            click.echo("{} ... OK!".format(local))
+        else:
+            click.echo("{} ... fetching...".format(local))
+            directory = ops.dirname(local)
 
-            # figure out where the file would be, if we already had it
-            local = ops.abspath(ops.join(self.backup_location, filename))
+            if not ops.isdir(directory):
+                os.mkdir(directory)
 
-            # use lexists to account for git-annex and files possibly living in a remote location.
-            if ops.lexists(local):
-                click.echo("{} ... OK!".format(local)) # yay, report and move on
-            else: # get it!
-                click.echo("{} ... fetching...".format(local))
-                directory = ops.dirname(local)
+            sftp.get(filename, local)
 
-                if not ops.isdir(directory):
-                    # make directories if we need to
-                    os.mkdir(directory)
-
-                # fetch it!
-                self.sftp.get(filename, local)
-
-
+    # The contextmanager turns a method which yields into something which can
+    # be used with a with block.  And error in the block gets re-raised at the
+    # yield statement so the finally block can fire, closing the connection
+    # down.
+    @contextmanager
     def connect(self):
+        """Connect to the backup host and yield an sftp client, cleaning up after"""
         # make a client
         client = paramiko.SSHClient()
 
-        # load up user's host keys
-        client.load_system_host_keys()
+        try:
+            # load up user's host keys
+            client.load_system_host_keys()
 
-        # try and connect
-        client.connect(self.host, self.port, username = self.username, password = self.password)
+            # Try and connect, using the supplied password or SSH agent
+            client.connect(self.host, self.port, username = self.username, password = self.password)
 
-        return client
+            sftp = client.open_sftp()
+
+            yield sftp
+        finally:
+            client.close()
 
     # recurse while yielding results
     # modified from https://stackoverflow.com/questions/13205875/add-an-item-into-a-list-recursively
-    def find_all(self, directory):
+    @staticmethod
+    def find_all(sftp, directory):
         # loop over the directory, getting the atributes
-        for item in self.sftp.listdir_attr(directory):
+        for item in sftp.listdir_attr(directory):
             # use join on the string, not os.path join to avoid possible cross-platform issues
             # though this assumes the server is running linux.
             path = '/'.join([directory, item.filename])
@@ -92,7 +98,7 @@ class MobilePhotos(AbstractService):
                 yield path
             else: # path is a dir
                 try: # so we recurse!
-                    for found_path in self.find_all(path):
+                    for found_path in MobilePhotos.find_all(sftp, path):
                         yield found_path
                 except EnvironmentError:
                     pass # ignore errors
