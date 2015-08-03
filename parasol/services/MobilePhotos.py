@@ -36,11 +36,10 @@ class MobilePhotos(AbstractService):
         self.password        = config.get('password')
 
     def do_backup(self):
+        """Backup all photos on the remote path"""
         with self.connect() as sftp:
-            # change to the mobile location
             sftp.chdir(self.remote_path)
 
-            # recurse from there, looking for photos
             for filename in MobilePhotos.find_all(sftp, '.'):
                 self.backup_file(sftp, filename)
 
@@ -51,16 +50,14 @@ class MobilePhotos(AbstractService):
 
         # use lexists to account for git-annex and files possibly living in a remote location.
         if ops.lexists(local):
-            click.echo("{} ... OK!".format(local)) # yay, report and move on
-        else: # get it!
+            click.echo("{} ... OK!".format(local))
+        else:
             click.echo("{} ... fetching...".format(local))
             directory = ops.dirname(local)
 
             if not ops.isdir(directory):
-                # make directories if we need to
                 os.mkdir(directory)
 
-            # fetch it!
             sftp.get(filename, local)
 
     # The contextmanager turns a method which yields into something which can
