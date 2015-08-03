@@ -38,4 +38,4 @@ class AbstractService(object):
 
     def echo(self, message):
         if self.verbose is True:
-            click.echo(message)
+            click.echo("[{service}] {message}".format(service = self.__class__.__name__, message = message))
