@@ -19,11 +19,11 @@
 from parasol.services.AbstractService import AbstractService
 import parasol.util as util
 
+import paramiko
+
 import os.path as ops
 import os
 import stat
-import paramiko
-import click
 from contextlib import contextmanager
 
 class MobilePhotos(AbstractService):
@@ -53,9 +53,9 @@ class MobilePhotos(AbstractService):
 
         # use lexists to account for git-annex and files possibly living in a remote location.
         if ops.lexists(local):
-            click.echo("{} ... OK!".format(local))
+            self.echo("{} ... OK!".format(local))
         else:
-            click.echo("{} ... fetching...".format(local))
+            self.echo("{} ... fetching...".format(local))
 
             with sftp.open(filename, "r") as f:
                 util.write(local, f.read(), binary = True)

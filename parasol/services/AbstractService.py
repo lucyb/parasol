@@ -17,6 +17,8 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 import parasol.util as util
 
+import click
+
 import abc
 import os.path
 
@@ -33,3 +35,5 @@ class AbstractService(object):
     def backup_path(self, filename):
         return os.path.abspath(os.path.join(self.backup_location, filename))
 
+    def echo(self, message):
+        click.echo(message)
