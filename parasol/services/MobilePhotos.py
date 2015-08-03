@@ -83,8 +83,6 @@ class MobilePhotos(AbstractService):
         finally:
             client.close()
 
-        return client
-
     # recurse while yielding results
     # modified from https://stackoverflow.com/questions/13205875/add-an-item-into-a-list-recursively
     @staticmethod
