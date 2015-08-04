@@ -56,12 +56,9 @@ class MobilePhotos(AbstractService):
             click.echo("{} ... OK!".format(local))
         else:
             click.echo("{} ... fetching...".format(local))
-            directory = ops.dirname(local)
 
-            if not ops.isdir(directory):
-                os.mkdir(directory)
-
-            sftp.get(filename, local)
+            with sftp.open(filename, "r") as f:
+                util.write(local, f.read(), binary = True)
 
     # The contextmanager turns a method which yields into something which can
     # be used with a with block.  And error in the block gets re-raised at the
