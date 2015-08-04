@@ -41,7 +41,7 @@ class AbstractService(object):
 
         directory = os.path.dirname(filename)
         if not os.path.isdir(directory):
-            os.mkdir(directory)
+            os.makedirs(directory, mode = 0o700)
 
         with open(filename, mode) as fd:
             fd.write(data)
