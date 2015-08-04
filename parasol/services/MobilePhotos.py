@@ -17,6 +17,8 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from parasol.services.AbstractService import AbstractService
+import parasol.util as util
+
 import os.path as ops
 import os
 import stat
@@ -28,7 +30,8 @@ class MobilePhotos(AbstractService):
     """All the photos from your mobile phone"""
 
     def __init__(self, config):
-        self.backup_location = ops.expandvars(ops.expanduser(config['backup_location']))
+        super().__init__(config)
+
         self.host            = config['host']
         self.remote_path     = config['remote_path']
         self.port            = int(config.get('port', 22))
@@ -46,7 +49,7 @@ class MobilePhotos(AbstractService):
     def backup_file(self, sftp, filename):
         """Backup one file via sftp"""
         # figure out where the file would be, if we already had it
-        local = ops.abspath(ops.join(self.backup_location, filename))
+        local = self.backup_path(filename)
 
         # use lexists to account for git-annex and files possibly living in a remote location.
         if ops.lexists(local):

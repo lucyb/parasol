@@ -15,20 +15,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
+import parasol.util as util
 
 import abc
+import os.path
 
 class AbstractService(object):
     __metaclass__ = abc.ABCMeta
+
+    def __init__(self, config):
+        self.backup_location = util.expandpath(config['backup_location'])
 
     @abc.abstractmethod
     def do_backup(self):
         """Run the backup for the service"""
 
-    def write(self, filename, data, append=False):
-        mode = 'w'
-        if append:
-            mode = 'a'
+    def backup_path(self, filename):
+        return os.path.abspath(os.path.join(self.backup_location, filename))
 
-        with open(filename, mode) as fd:
-            fd.write(data)
