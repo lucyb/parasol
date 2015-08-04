@@ -20,7 +20,6 @@ import parasol.util as util
 
 import datetime
 import requests
-import click
 import json
 
 class Trello(AbstractService):
