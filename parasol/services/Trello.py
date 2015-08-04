@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 from parasol.services.AbstractService import AbstractService
+import parasol.util as util
 
 import datetime
 import requests
@@ -77,4 +78,4 @@ class Trello(AbstractService):
         checklists = self.connect(board_url + '/checklists')
         board_info['checklists'] = checklists.json()
 
-        self.write(filepath, json.dumps(board_info))
+        util.write(filepath, json.dumps(board_info))

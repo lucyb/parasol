@@ -15,8 +15,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
-
 from parasol.services.AbstractService import AbstractService
+import parasol.util as util
+
 import datetime
 import requests
 import json
@@ -37,7 +38,7 @@ class Pinboard(AbstractService):
         filepath = self.backup_path(filename)
 
         pinboard = self.connect()
-        self.write(filepath, json.dumps(pinboard.json()))
+        util.write(filepath, json.dumps(pinboard.json()))
 
     def connect(self):
         auth_token = self.token

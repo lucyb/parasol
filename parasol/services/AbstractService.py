@@ -19,7 +19,6 @@ import parasol.util as util
 
 import abc
 import os.path
-import os
 
 class AbstractService(object):
     __metaclass__ = abc.ABCMeta
@@ -33,16 +32,4 @@ class AbstractService(object):
 
     def backup_path(self, filename):
         return os.path.abspath(os.path.join(self.backup_location, filename))
-
-    def write(self, filename, data, append=False):
-        mode = 'w'
-        if append:
-            mode = 'a'
-
-        directory = os.path.dirname(filename)
-        if not os.path.isdir(directory):
-            os.makedirs(directory, mode = 0o700)
-
-        with open(filename, mode) as fd:
-            fd.write(data)
 
