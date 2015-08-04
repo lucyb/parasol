@@ -50,6 +50,7 @@ def list_services(ctx, param, value):
                         is_eager     = True)
 @click.option('--config', help='Specify location of the config file',
                          default='config.ini')
+@click.option('-v', '--verbose', count=True)
 def run(services, config):
 	backupStuff = BackupServices(services, config)
 
