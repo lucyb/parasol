@@ -26,7 +26,7 @@ class BackupServices(object):
 
     __service_registry__ = None
 
-    def __init__(self, services, config):
+    def __init__(self, services, config, logging_level):
         #Get config options
         self.config_settings  = BackupServices.read_config(config)
         #Populate the list of services, if required
