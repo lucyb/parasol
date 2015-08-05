@@ -20,6 +20,24 @@ from parasol.BackupServices import BackupServices
 import click
 import inspect
 
+def logging_levels():
+    return {
+        1: 'CRITICAL',
+        2: 'ERROR',
+        3: 'WARNING',
+        4: 'INFO',
+        5: 'DEBUG'
+    }
+
+def calc_logging_level(verbose):
+    if verbose >= 5:
+        #Can't go higher than debug
+        return logging_levels()[5]
+    if verbose == 0:
+        #Critical errors only if nothing is specified
+        return logging_levels()[1]
+    return logging_levels()[verbose]
+
 # List services callback
 #
 # This uses a callback to interupt the usual argument handling
@@ -51,8 +69,9 @@ def list_services(ctx, param, value):
 @click.option('--config', help='Specify location of the config file',
                          default='config.ini')
 @click.option('-v', '--verbose', count=True)
-def run(services, config):
-	backupStuff = BackupServices(services, config)
+def run(services, config, verbose):
+    logging_level = calc_logging_level(verbose)
+    backupStuff = BackupServices(services, config, logging_level)
 
 if __name__ == '__main__':
     run()

@@ -32,7 +32,7 @@ class BackupServices(object):
             'verbose': False
             }
 
-    def __init__(self, services, config_file):
+    def __init__(self, services, config, logging_level):
         #Get config options
         self.config_settings  = BackupServices.read_config(config_file, defaults = self.config_defaults)
         #Populate the list of services, if required
