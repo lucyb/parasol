@@ -15,11 +15,27 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
+import parasol.util as util
 
-class Gmail(AbstractService):
+import click
 
-	def __init__(self):
-		#Required?
+import abc
+import os.path
 
-	def doBackup(self):
-		#do stuff
+class AbstractService(object):
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, config):
+        self.backup_location = util.expandpath(config['backup_location'])
+        self.verbose = config.getboolean('verbose', fallback = False)
+
+    @abc.abstractmethod
+    def do_backup(self):
+        """Run the backup for the service"""
+
+    def backup_path(self, filename):
+        return os.path.abspath(os.path.join(self.backup_location, filename))
+
+    def echo(self, message):
+        if self.verbose is True:
+            click.echo("[{service}] {message}".format(service = self.__class__.__name__, message = message))

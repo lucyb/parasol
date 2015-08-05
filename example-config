@@ -1,16 +1,18 @@
-[backup]
-backup_location=
+[Backup]
+backup_location=~/Documents/backups
 tmp_location=
 
-[evernote]
-token=
+[Evernote]
 url=
+token=
 
-[trello]
+[Pinboard]
+service=Pinboard
+url=https://api.pinboard.in/v1/
+token=
+
+[Trello]
+service=Trello
+url=https://api.trello.com/
 key=
 token=
-url=
-
-[pinboard]
-token=
-url=

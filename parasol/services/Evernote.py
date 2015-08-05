@@ -16,25 +16,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-import abc
+from parasol.services.AbstractService import AbstractService
+import datetime
+import requests
 
-class AbstractService(object):
-    __metaclass__ = abc.ABCMeta
+class Evernote(AbstractService):
+    '''All of your notes'''
 
-    @abc.abstractmethod
+    default_url = 'https://api.evernote.com/'
+
+    def __init__(self, config):
+        self.url   = config.get('url', self.default_url)
+        self.token = config['token']
+
     def do_backup(self):
-        """Run the backup for the service"""
+        raise NotImplementedError()
 
-    def write(self, filename, data, append=False):
-        mode = 'w'
-        if append:
-            mode = 'a'
+    def connect(self):
+        auth_token = self.token
+        path       = ''
+        params     = {'format': 'json', 'auth_token': auth_token}
 
-        with open(filename, mode) as fd:
-            fd.write(data)
+        response = requests.get(self.url + path, params = params, stream=True, verify=True)
 
-    @classmethod
-    def list_services(cls):
-        """List all the services we know about"""
-        for clss in cls.__subclasses__():
-            yield clss.__name__, clss
+        #Throw error if response is not 200
+        response.raise_for_status()
+
+        return response

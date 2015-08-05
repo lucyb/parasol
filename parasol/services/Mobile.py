@@ -16,10 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-class Wordpress(AbstractService):
+from parasol.services.AbstractService import AbstractService
 
-	def __init__(self):
-		#Required?
+class Mobile(AbstractService):
+    """Application and settings data from your mobile phone"""
 
-	def doBackup(self):
-		#do stuff
+    def __init__(self, config):
+        raise NotImplementedError
+
+    def do_backup(self):
+        raise NotImplementedError
+		#backup clue data
+		#backup weight data
+		#backup notes
+		#backup settings?

@@ -15,23 +15,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
+from parasol.BackupServices import BackupServices
 
 import click
-import services
-from services.AbstractService import AbstractService
-from services.Pinboard import Pinboard
-from services.Trello import Trello
 import inspect
-
-class BackupServices(object):
-
-    def __init__(self, services):
-        #if services is empty, then fetch all classes in the services
-        #module that are a subclass of AbstractService
-        all_services = AbstractService.list_services()
-        for name, service in all_services:
-            click.echo(name)
-            service('')
 
 # List services callback
 #
@@ -48,7 +35,7 @@ def list_services(ctx, param, value):
         return
 
     # iterate over the services list, printing names and the docstrings
-    for name, service in AbstractService.list_services():
+    for name, service in BackupServices.service_registry().items():
         click.echo("{} - {}".format(name, inspect.getdoc(service)))
 
     # exit with status 0
@@ -61,8 +48,10 @@ def list_services(ctx, param, value):
                         callback     = list_services,
                         expose_value = False,
                         is_eager     = True)
-def run(services):
-    backupStuff = BackupServices(services)
+@click.option('--config', help='Specify location of the config file',
+                         default='config.ini')
+def run(services, config):
+	backupStuff = BackupServices(services, config)
 
 if __name__ == '__main__':
     run()

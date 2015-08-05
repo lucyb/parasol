@@ -16,32 +16,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from services.AbstractService import AbstractService
-import datetime
-import requests
-import json
+from parasol.services.AbstractService import AbstractService
 
-class Pinboard(AbstractService):
-    """All of your bookmarks"""
+class Flickr(AbstractService):
+    """All of your photos"""
 
-    url = 'https://api.pinboard.in/v1/posts/all'
+    url = 'https://'
 
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, config):
+        if 'url' in config:
+            self.url   = config['url']
+        self.token = config['token']
 
     def do_backup(self):
-        #do stuff
-        filename = 'Pinboard-{}.json'.format(datetime.date.today())
-        pinboard = self.connect()
-        self.write(filename, json.dumps(pinboard.json()))
+        filename = 'Flickr-{}.json'.format(datetime.date.today())
+        flickr = self.connect()
+        self.write(filename, json.dumps(flickr.json()))
 
     def connect(self):
-
         auth_token = self.token
+        path       = ''
         params     = {'format': 'json', 'auth_token': auth_token}
 
-        response = requests.get(Pinboard.url, params = params, stream=True, verify=True)
+        response = requests.get(self.url + path, params = params, stream=True, verify=True)
 
-        response.raise_for_status()     #Throw error if response is not 200
+        #Throw error if response is not 200
+        response.raise_for_status()
 
         return response
+

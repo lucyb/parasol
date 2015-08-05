@@ -1,7 +1,6 @@
-# Backup Services
+# Parasol: Keeping you safe when The Cloud(TM) goes away.
 
-Set of python scripts to backup various online services and from my 
-mobile phone. 
+A set of python scripts to backup various online services, and data from a mobile phone. 
 
 ## How does it work?
 
@@ -18,7 +17,7 @@ arguments to back them all up.
 ## Usage
 
 ``` shell
-Usage: backup.py [OPTIONS] SERVICES
+Usage: parasol.py [OPTIONS] SERVICES
 
 Options:
   --help                  Show this message and exit.

@@ -15,21 +15,24 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
+from parasol.services.AbstractService import AbstractService
+import parasol.util as util
 
-from services.AbstractService import AbstractService
 import datetime
 import requests
-import click
 import json
 
 class Trello(AbstractService):
     """All your organisation with everyone"""
 
-    url   = 'https://api.trello.com/'
+    default_url = 'https://api.trello.com/1/'
 
-    def __init__(self, key, token):
-        self.key   = key
-        self.token = token
+    def __init__(self, config):
+        super().__init__(config)
+
+        self.url   = config.get('url', self.default_url)
+        self.key   = config['key']
+        self.token = config['token']
 
     def do_backup(self):
         #For each board, fetch all data and write the json to a file
@@ -47,7 +50,7 @@ class Trello(AbstractService):
 
 
     def boards_to_backup(self):
-        boards = self.connect('1/members/me/boards')
+        boards = self.connect('members/me/boards')
         board_dict = {}
         for boardJson in boards.json():
             board_dict[boardJson['id']] = boardJson['name']
@@ -55,23 +58,24 @@ class Trello(AbstractService):
         return board_dict
 
     def write_board_data(self, board_id, board_name):
+        self.echo("Backing up {}".format(board_name))
         filename = 'Trello-{0}-{1}.json'.format(board_name, str(datetime.date.today()));
+        filepath = self.backup_path(filename)
 
-        board_url = '1/boards/' + board_id
+        board_url = 'boards/' + board_id
 
         board_info = {}
 
         board = self.connect(board_url)
-        board_info['board'] = board
+        board_info['board'] = board.json()
 
         lists = self.connect(board_url + '/lists')
-        board_info['lists'] = lists
+        board_info['lists'] = lists.json()
 
         cards = self.connect(board_url + '/cards')
-        board_info['cards'] = cards
+        board_info['cards'] = cards.json()
 
         checklists = self.connect(board_url + '/checklists')
-        board_info['checklists'] = checklists
+        board_info['checklists'] = checklists.json()
 
-        self.write(filename, json.dumps(board_info))
-
+        util.write(filepath, json.dumps(board_info))
