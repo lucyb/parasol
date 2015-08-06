@@ -16,3 +16,40 @@ service=Trello
 url=https://api.trello.com/
 key=
 token=
+
+#Logging configuration
+[loggers]
+keys=root
+
+[handlers]
+keys=stream_handler,file_handler,smtp_handler
+
+[formatters]
+keys=default
+
+[logger_root]
+level=NOTSET
+handlers=stream_handler
+
+[handler_stream_handler]
+class=StreamHandler
+level=NOTSET
+formatter=default
+args=(sys.stdout,)
+
+[handler_file_handler]
+class=FileHandler
+level=DEBUG
+formatter=default
+args=('parasol.log', 'w')
+
+[handler_smtp_handler]
+class=handlers.SMTPHandler
+level=WARN
+formatter=default
+args=('localhost', 'from@abc', ['user1@abc', 'user2@xyz'], 'Parasol Backup')
+
+[formatter_default]
+format=F1 %(asctime)s %(levelname)s %(message)s
+datefmt=
+class=logging.Formatter
