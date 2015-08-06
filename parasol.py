@@ -66,9 +66,10 @@ def list_services(ctx, param, value):
                         callback     = list_services,
                         expose_value = False,
                         is_eager     = True)
-@click.option('--config', help='Specify location of the config file',
-                         default='config.ini')
-@click.option('-v', '--verbose', count=True)
+@click.option('--config',
+                        help='Specify location of the config file',
+                        default='config.ini')
+@click.option('-v',     help='Verbose logging. Can be specified multiple times to increase verbosity', count=True)
 def run(services, config, verbose):
     logging_level = calc_logging_level(verbose)
     backupStuff = BackupServices(services, config, logging_level)
