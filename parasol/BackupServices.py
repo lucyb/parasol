@@ -20,6 +20,8 @@ from parasol.ServiceRegistry import ServiceRegistry, ServiceNotFoundException
 
 import click
 import configparser
+import logging.config
+import logging
 import sys
 import os.path
 
@@ -35,6 +37,8 @@ class BackupServices(object):
     def __init__(self, services, config, logging_level):
         #Get config options
         self.config_settings  = BackupServices.read_config(config_file, defaults = self.config_defaults)
+        #Configure logging
+        self.setup_logging(logging_level)
         #Populate the list of services, if required
         self.services = self.populate_services(services)
         #Run the backups
@@ -77,6 +81,12 @@ class BackupServices(object):
         if 'service' in self.config_settings[section]:
             return self.config_settings[section]['service']
         return section
+
+    def setup_logging(self, logging_level):
+        """Setup logger using file config, then customise"""
+        logging.config.fileConfig(self.config_settings, disable_existing_loggers=False)
+        logger = logging.getLogger()
+        logger.setLevel(logging_level)
 
     @classmethod
     def service_registry(cls):
