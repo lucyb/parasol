@@ -20,7 +20,6 @@ from parasol.ServiceRegistry import ServiceRegistry, ServiceNotFoundException
 
 import click
 import configparser
-import logging.config
 import logging
 import sys
 import os.path
@@ -38,7 +37,7 @@ class BackupServices(object):
         #Get config options
         self.config_settings  = BackupServices.read_config(config_file, defaults = self.config_defaults)
         #Configure logging
-        self.setup_logging(logging_level)
+        BackupServices.setup_logging(logging_level)
         #Populate the list of services, if required
         self.services = self.populate_services(services)
         #Run the backups
@@ -82,12 +81,6 @@ class BackupServices(object):
             return self.config_settings[section]['service']
         return section
 
-    def setup_logging(self, logging_level):
-        """Setup logger using file config, then customise"""
-        logging.config.fileConfig(self.config_settings, disable_existing_loggers=False)
-        logger = logging.getLogger()
-        logger.setLevel(logging_level)
-
     @classmethod
     def service_registry(cls):
         """Return a service registry to use"""
@@ -96,7 +89,16 @@ class BackupServices(object):
         return cls.__service_registry__
 
     @staticmethod
-    def read_config(config_file, defaults):
+    def setup_logging(logging_level):
+        """Setup logger"""
+        logger = logging.getLogger()
+        handler = logging.StreamHandler()
+        logger.addHandler(handler)
+        logger.setLevel(logging_level)
+        logger.debug('setting up logger')
+
+    @staticmethod
+    def read_config(config_file):
         """Use ConfigParser to read in the configuration file from the path specified by config_file"""
         config = configparser.ConfigParser(default_section='Backup', defaults = defaults)
         config.read(config_file)
