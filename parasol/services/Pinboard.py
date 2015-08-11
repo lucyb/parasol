@@ -38,7 +38,7 @@ class Pinboard(AbstractService):
         filepath = self.backup_path(filename)
 
         pinboard = self.connect()
-        self.echo('Backing up to {}'.format(filename))
+        self.logger.info('Backing up to {}'.format(filename))
         util.write(filepath, json.dumps(pinboard.json()))
 
     def connect(self):

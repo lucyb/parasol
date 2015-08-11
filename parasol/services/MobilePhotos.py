@@ -53,9 +53,9 @@ class MobilePhotos(AbstractService):
 
         # use lexists to account for git-annex and files possibly living in a remote location.
         if ops.lexists(local):
-            self.echo("{} ... OK!".format(local))
+            self.debug("{} ... OK!".format(local))
         else:
-            self.echo("{} ... fetching...".format(local))
+            self.debug("{} ... fetching...".format(local))
 
             with sftp.open(filename, "r") as f:
                 util.write(local, f.read(), binary = True)
