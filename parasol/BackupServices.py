@@ -21,14 +21,20 @@ from parasol.ServiceRegistry import ServiceRegistry, ServiceNotFoundException
 import click
 import configparser
 import sys
+import os.path
 
 class BackupServices(object):
 
     __service_registry__ = None
 
-    def __init__(self, services, config):
+    config_defaults = {
+            'backup_location': os.path.join('~', 'Documents', 'backups'),
+            'verbose': False
+            }
+
+    def __init__(self, services, config_file):
         #Get config options
-        self.config_settings  = BackupServices.read_config(config)
+        self.config_settings  = BackupServices.read_config(config_file, defaults = self.config_defaults)
         #Populate the list of services, if required
         self.services = self.populate_services(services)
         #Run the backups
@@ -80,9 +86,9 @@ class BackupServices(object):
         return cls.__service_registry__
 
     @staticmethod
-    def read_config(config_file):
+    def read_config(config_file, defaults):
         """Use ConfigParser to read in the configuration file from the path specified by config_file"""
-        config = configparser.ConfigParser(default_section='Backup')
+        config = configparser.ConfigParser(default_section='Backup', defaults = defaults)
         config.read(config_file)
         return config
 
