@@ -20,20 +20,19 @@ from parasol.BackupServices import BackupServices
 import click
 import inspect
 
-def logging_levels():
-    return {
-        0: 'CRITICAL',
-        1: 'ERROR',
-        2: 'WARNING',
-        3: 'INFO',
-        4: 'DEBUG'
-    }
+logging_levels = [
+        'CRITICAL',
+        'ERROR',
+        'WARNING',
+        'INFO',
+        'DEBUG'
+    ]
 
 def calc_logging_level(verbose):
-    if verbose >= 4:
+    if verbose > 4:
         #Can't go higher than debug
-        return logging_levels()[4]
-    return logging_levels()[verbose]
+        return logging_levels[4]
+    return logging_levels[verbose]
 
 # List services callback
 #
