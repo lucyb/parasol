@@ -28,6 +28,7 @@ class AbstractService(object):
 
     def __init__(self, config):
         self.backup_location = util.expandpath(config['backup_location'])
+        #Create a child logger for each service based on the logger configured in BackupServices.py
         self.logger = logging.getLogger(self.__class__.__name__)
 
     @abc.abstractmethod
@@ -35,4 +36,5 @@ class AbstractService(object):
         """Run the backup for the service"""
 
     def backup_path(self, filename):
+        """Return the full filepath"""
         return os.path.abspath(os.path.join(self.backup_location, filename))
