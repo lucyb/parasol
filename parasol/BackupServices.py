@@ -18,7 +18,6 @@
 from parasol.services import *
 from parasol.ServiceRegistry import ServiceRegistry, ServiceNotFoundException
 
-import click
 import configparser
 import logging
 import sys
@@ -31,7 +30,7 @@ class BackupServices(object):
         #Get config options
         self.config_settings  = BackupServices.read_config(config)
         #Configure logging
-        BackupServices.setup_logging(logging_level)
+        self.logger = BackupServices.setup_logging(logging_level)
         #Populate the list of services, if required
         self.services = self.populate_services(services)
         #Run the backups
@@ -43,12 +42,12 @@ class BackupServices(object):
         for service_name, service_config in self.services_to_run():
             try:
                 service_class = self.service_registry().get(service_name)
-                BackupServices.run_backup(service_name, service_class, service_config)
+                self.run_backup(service_name, service_class, service_config)
             except ServiceNotFoundException:
-                click.echo('Found config section for {} but no matching service. Skipping'.format(service_name))
+                self.logger.warning('Found config section for {} but no matching service. Skipping'.format(service_name))
                 pass
             except:
-                click.echo(sys.exc_info())
+                self.logger.error(sys.exc_info())
                 #Continue so that the next backup can be run
                 #A problem with one service should not stop us from backing up the rest!
                 pass
@@ -58,6 +57,12 @@ class BackupServices(object):
         if not services:
             services = self.config_settings.sections()
         return services
+
+    def run_backup(self, service_name, service_class, service_config):
+        """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
+        self.logger.error('Backing up ' + service_name)
+        service = service_class(service_config)
+        service.do_backup()
 
     def services_to_run(self):
         """Return the name and config details for each service to run"""
@@ -82,14 +87,14 @@ class BackupServices(object):
             cls.__service_registry__ = ServiceRegistry(AbstractService)
         return cls.__service_registry__
 
-    @staticmethod
-    def setup_logging(logging_level):
+    @classmethod
+    def setup_logging(cls, logging_level):
         """Setup logger"""
         logger = logging.getLogger()
         handler = logging.StreamHandler()
         logger.addHandler(handler)
         logger.setLevel(logging_level)
-        logger.debug('setting up logger')
+        return logger
 
     @staticmethod
     def read_config(config_file):
@@ -97,10 +102,3 @@ class BackupServices(object):
         config = configparser.ConfigParser(default_section='Backup')
         config.read(config_file)
         return config
-
-    @staticmethod
-    def run_backup(service_name, service_class, service_config):
-        """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
-        click.echo('Backing up ' + service_name)
-        service = service_class(service_config)
-        service.do_backup()
