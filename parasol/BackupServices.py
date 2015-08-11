@@ -53,7 +53,7 @@ class BackupServices(object):
                 self.logger.warning('Found config section for {} but no matching service. Skipping'.format(service_name))
                 pass
             except:
-                self.logger.error(sys.exc_info())
+                self.logger.critical(sys.exc_info())
                 #Continue so that the next backup can be run
                 #A problem with one service should not stop us from backing up the rest!
                 pass
@@ -66,7 +66,7 @@ class BackupServices(object):
 
     def run_backup(self, service_name, service_class, service_config):
         """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
-        self.logger.error('Backing up ' + service_name)
+        self.logger.info('Backing up {}'.format(service_name))
         service = service_class(service_config)
         service.do_backup()
 
