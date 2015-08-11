@@ -91,9 +91,15 @@ class BackupServices(object):
     def setup_logging(cls, logging_level):
         """Setup logger"""
         logger = logging.getLogger()
+        #Log to console
         handler = logging.StreamHandler()
         logger.addHandler(handler)
+        #Create formatter
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        handler.setFormatter(formatter)
+        #Set the verbosity, as specified via command line arg
         logger.setLevel(logging_level)
+
         return logger
 
     @staticmethod
