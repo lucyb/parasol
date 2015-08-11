@@ -22,20 +22,17 @@ import inspect
 
 def logging_levels():
     return {
-        1: 'CRITICAL',
-        2: 'ERROR',
-        3: 'WARNING',
-        4: 'INFO',
-        5: 'DEBUG'
+        0: 'CRITICAL',
+        1: 'ERROR',
+        2: 'WARNING',
+        3: 'INFO',
+        4: 'DEBUG'
     }
 
 def calc_logging_level(verbose):
-    if verbose >= 5:
+    if verbose >= 4:
         #Can't go higher than debug
-        return logging_levels()[5]
-    if verbose == 0:
-        #Critical errors only if nothing is specified
-        return logging_levels()[1]
+        return logging_levels()[4]
     return logging_levels()[verbose]
 
 # List services callback
