@@ -28,8 +28,7 @@ class BackupServices(object):
     __service_registry__ = None
 
     config_defaults = {
-            'backup_location': os.path.join('~', 'Documents', 'backups'),
-            'verbose': False
+            'backup_location': os.path.join('~', 'Documents', 'backups')
             }
 
     def __init__(self, services, config_file, logging_level):
