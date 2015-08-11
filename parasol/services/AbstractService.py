@@ -36,6 +36,3 @@ class AbstractService(object):
 
     def backup_path(self, filename):
         return os.path.abspath(os.path.join(self.backup_location, filename))
-
-    def echo(self, message):
-        self.logger.debug("[{service}] {message}".format(service = self.__class__.__name__, message = message))
