@@ -28,6 +28,7 @@ class AbstractService(object):
 
     def __init__(self, config):
         self.backup_location = util.expandpath(config['backup_location'])
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     @abc.abstractmethod
     def do_backup(self):
@@ -37,4 +38,4 @@ class AbstractService(object):
         return os.path.abspath(os.path.join(self.backup_location, filename))
 
     def echo(self, message):
-        logger.debug("[{service}] {message}".format(service = self.__class__.__name__, message = message))
+        self.logger.debug("[{service}] {message}".format(service = self.__class__.__name__, message = message))
