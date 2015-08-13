@@ -99,8 +99,8 @@ class BackupServices(object):
         #Log to console
         handler = logging.StreamHandler()
         logger.addHandler(handler)
-        #Create formatter
-        formatter = logging.Formatter("%(name)s - %(levelname)s - %(message)s")
+        #Create formatter, using fixed width fields
+        formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
         handler.setFormatter(formatter)
         #Set the verbosity, as specified via command line arg
         logger.setLevel(logging_level)
