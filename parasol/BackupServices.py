@@ -50,7 +50,7 @@ class BackupServices(object):
                 BackupServices.run_backup(section_name, service_class, service_config)
                 self.run_backup(section_name, service_class, service_config)
             except ServiceNotFoundException:
-                click.echo('Found config section for {} but no matching service. Skipping'.format(service_name))
+                click.echo('Found config section for {} but no matching service. Skipping'.format(section_name))
                 pass
             except:
                 click.echo(sys.exc_info())
