@@ -52,7 +52,7 @@ class BackupServices(object):
                 self.logger.warning('Found config section for {} but no matching service. Skipping'.format(service_name))
                 pass
             except:
-                self.logger.exception(sys.exc_info())
+                self.logger.exception("Problem backing up %s", service_name)
                 #Continue so that the next backup can be run
                 #A problem with one service should not stop us from backing up the rest!
                 pass
