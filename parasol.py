@@ -28,11 +28,18 @@ logging_levels = [
         'DEBUG'
     ]
 
-def calc_logging_level(verbose):
-    if verbose > 4:
+def calc_logging_level(verbose, quiet):
+    if verbose == 0:
+        #Verbosity not specified
+        if quiet:
+            #Show critical errors only
+            return logging_levels[0]
+        #Nothing specified, default to showing all errors
+        return logging_levels[1]
+    if verbose >= 3:
         #Can't go higher than debug
         return logging_levels[4]
-    return logging_levels[verbose]
+    return logging_levels[verbose+1]
 
 # List services callback
 #
@@ -66,8 +73,10 @@ def list_services(ctx, param, value):
                         help='Specify location of the config file',
                         default='config.ini')
 @click.option('-v',     help='Verbose logging. Can be specified multiple times to increase verbosity', count=True)
-def run(services, config, v):
-    logging_level = calc_logging_level(v)
+@click.option('-q',     help='Quiet logging. Reduce logging output to critical errors only. Will be ignored if -v is specified',
+                        is_flag=True)
+def run(services, config, v, q):
+    logging_level = calc_logging_level(v, q)
     backupStuff = BackupServices(services, config, logging_level)
 
 if __name__ == '__main__':
