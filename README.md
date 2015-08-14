@@ -20,5 +20,9 @@ arguments to back them all up.
 Usage: parasol.py [OPTIONS] SERVICES
 
 Options:
-  --help                  Show this message and exit.
+  --list                 List services we know how to back up
+  --config TEXT          Specify location of the config file
+  -v                     Verbose logging. Can be specified multiple times to increase
+                         verbosity
+  --help                 Show this message and exit.
 ```

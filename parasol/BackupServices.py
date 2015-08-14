@@ -44,12 +44,13 @@ class BackupServices(object):
     def run_backups(self):
         """Run the backup for each service specified in the config files provided"""
 
-        for service_name, service_config in self.services_to_run():
+        for section_name, service_config in self.services_to_run():
             try:
+                service_name  = self.get_service_name(section_name)
                 service_class = self.service_registry().get(service_name)
-                self.run_backup(service_name, service_class, service_config)
+                self.run_backup(section_name, service_class, service_config)
             except ServiceNotFoundException:
-                self.logger.warning('Found config section for {} but no matching service. Skipping'.format(service_name))
+                self.logger.warning('Found config section for {section_name} {[service_name]} but no matching service. Skipping'.format(section_name=section_name, service_name=service_name))
                 pass
             except:
                 self.logger.exception("Problem backing up %s", service_name)
@@ -77,7 +78,7 @@ class BackupServices(object):
             #Return config details for each service that we care about 
             if service_name in self.services:
                 service_config = self.config_settings[section]
-                yield service_name, service_config
+                yield section, service_config
 
     def get_service_name(self, section):
         """Return the name of the service in this section of the config"""
