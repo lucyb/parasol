@@ -70,12 +70,15 @@ def list_services(ctx, param, value):
 @click.option('--config',
                         help='Specify location of the config file',
                         default='config.ini')
-@click.option('-v',     help='Verbose logging. Can be specified multiple times to increase verbosity', count=True)
-@click.option('-q',     help='Quiet logging. Reduce logging output to critical errors only. Will be ignored if -v is specified',
+@click.option('-v', '--verbose',
+                        help='Verbose logging. Can be specified multiple times to increase verbosity', 
+                        count=True)
+@click.option('-q', '--quiet',
+                        help='Quiet logging. Reduce logging output to critical errors only. Will be ignored if -v is specified',
                         is_flag=True)
-def run(services, config, v, q):
-    logging_level = calc_logging_level(v, q)
-    backupStuff = BackupServices(services, config, logging_level)
+def run(services, config, verbose, quiet):
+    logging_level = calc_logging_level(verbose, quiet)
+    backupStuff   = BackupServices(services, config, logging_level)
 
 if __name__ == '__main__':
     run()
