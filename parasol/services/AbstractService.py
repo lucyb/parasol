@@ -21,21 +21,20 @@ import click
 
 import abc
 import os.path
+import logging
 
 class AbstractService(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, config):
         self.backup_location = util.expandpath(config['backup_location'])
-        self.verbose = config.getboolean('verbose', fallback = False)
+        #Create a child logger for each service based on the logger configured in BackupServices.py
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     @abc.abstractmethod
     def do_backup(self):
         """Run the backup for the service"""
 
     def backup_path(self, filename):
+        """Return the full filepath"""
         return os.path.abspath(os.path.join(self.backup_location, filename))
-
-    def echo(self, message):
-        if self.verbose is True:
-            click.echo("[{service}] {message}".format(service = self.__class__.__name__, message = message))

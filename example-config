@@ -3,9 +3,6 @@
 # Can be overriden in each subsection.
 # backup_location=~/Documents/backups
 
-# How noisy are we?  Controls logs sent to stdout.
-# verbose = False
-
 [Evernote]
 url=
 token=
