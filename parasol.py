@@ -29,17 +29,15 @@ logging_levels = [
     ]
 
 def calc_logging_level(verbose, quiet):
-    if verbose == 0:
-        #Verbosity not specified
-        if quiet:
-            #Show critical errors only
-            return logging_levels[0]
-        #Nothing specified, default to showing all errors
-        return logging_levels[1]
-    if verbose >= 3:
+    """Returns the appropriate logging level for the application. Defaulting to ERROR if nothing is specified"""
+    if quiet and verbose == 0:
+        #Show critical errors only
+        return logging_levels[0]
+
+    if verbose > 3:
         #Can't go higher than debug
-        return logging_levels[4]
-    return logging_levels[verbose+1]
+        verbose = 3
+    return logging_levels[verbose + 1]
 
 # List services callback
 #
