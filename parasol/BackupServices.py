@@ -92,6 +92,9 @@ class BackupServices(object):
         logger = logging.getLogger()
         #Log to console
         handler = logging.StreamHandler()
+        if not logging_level == 'DEBUG':
+            #handler.addFilter(logging.Filter('connectionpool'))
+            handler.addFilter(LoggerWhitelist(cls.service_registry().keys()))
         logger.addHandler(handler)
         #Create formatter, using fixed width fields
         formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
@@ -101,3 +104,17 @@ class BackupServices(object):
 
         return logger
 
+    @staticmethod
+    def read_config(config_file, defaults):
+        """Use ConfigParser to read in the configuration file from the path specified by config_file"""
+        config = configparser.ConfigParser(default_section='Backup', defaults = defaults)
+        config.read(config_file)
+        return config
+
+class LoggerWhitelist(logging.Filter):
+    """Whitelist for logging, from https://stackoverflow.com/a/17276457"""
+    def __init__(self, *whitelist):
+        self.whitelist = [logging.Filter(name) for name in whitelist]
+
+    def filter(self, record):
+        return any(f.filter(record) for f in self.whitelist)
