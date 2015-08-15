@@ -38,6 +38,7 @@ class Pinboard(AbstractService):
         filepath = self.backup_path(filename)
 
         pinboard = self.connect()
+        self.logger.info('Backing up to {}'.format(filename))
         util.write(filepath, json.dumps(pinboard.json()))
 
     def connect(self):
@@ -45,7 +46,7 @@ class Pinboard(AbstractService):
         path       = 'posts/all'
         params     = {'format': 'json', 'auth_token': auth_token}
 
-        response = requests.get(self.url + path, params = params, stream=True, verify=True)
+        response = requests.get(self.url + path, params = params, verify=True)
 
         #Throw error if response is not 200
         response.raise_for_status()

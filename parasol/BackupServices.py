@@ -18,17 +18,24 @@
 from parasol.services import *
 from parasol.ServiceRegistry import ServiceRegistry, ServiceNotFoundException
 
-import click
 import configparser
+import logging
 import sys
+import os.path
 
 class BackupServices(object):
 
     __service_registry__ = None
 
-    def __init__(self, services, config):
+    config_defaults = {
+            'backup_location': os.path.join('~', 'Documents', 'backups')
+            }
+
+    def __init__(self, services, config_file, logging_level):
         #Get config options
-        self.config_settings  = BackupServices.read_config(config)
+        self.config_settings  = BackupServices.read_config(config_file, defaults = self.config_defaults)
+        #Configure logging
+        self.logger = BackupServices.setup_logging(logging_level)
         #Populate the list of services, if required
         self.services = self.populate_services(services)
         #Run the backups
@@ -37,15 +44,16 @@ class BackupServices(object):
     def run_backups(self):
         """Run the backup for each service specified in the config files provided"""
 
-        for service_name, service_config in self.services_to_run():
+        for section_name, service_config in self.services_to_run():
             try:
+                service_name  = self.get_service_name(section_name)
                 service_class = self.service_registry().get(service_name)
-                BackupServices.run_backup(service_name, service_class, service_config)
+                self.run_backup(section_name, service_class, service_config)
             except ServiceNotFoundException:
-                click.echo('Found config section for {} but no matching service. Skipping'.format(service_name))
+                self.logger.warning('Found config section for {section_name} {[service_name]} but no matching service. Skipping'.format(section_name=section_name, service_name=service_name))
                 pass
             except:
-                click.echo(sys.exc_info())
+                self.logger.exception("Problem backing up %s", service_name)
                 #Continue so that the next backup can be run
                 #A problem with one service should not stop us from backing up the rest!
                 pass
@@ -56,6 +64,12 @@ class BackupServices(object):
             services = self.config_settings.sections()
         return services
 
+    def run_backup(self, service_name, service_class, service_config):
+        """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
+        self.logger.info('Backing up {}'.format(service_name))
+        service = service_class(service_config)
+        service.do_backup()
+
     def services_to_run(self):
         """Return the name and config details for each service to run"""
         for section in self.config_settings.sections():
@@ -64,7 +78,7 @@ class BackupServices(object):
             #Return config details for each service that we care about 
             if service_name in self.services:
                 service_config = self.config_settings[section]
-                yield service_name, service_config
+                yield section, service_config
 
     def get_service_name(self, section):
         """Return the name of the service in this section of the config"""
@@ -79,16 +93,24 @@ class BackupServices(object):
             cls.__service_registry__ = ServiceRegistry(AbstractService)
         return cls.__service_registry__
 
-    @staticmethod
-    def read_config(config_file):
-        """Use ConfigParser to read in the configuration file from the path specified by config_file"""
-        config = configparser.ConfigParser(default_section='Backup')
-        config.read(config_file)
-        return config
+    @classmethod
+    def setup_logging(cls, logging_level):
+        """Setup logger"""
+        logger = logging.getLogger()
+        #Log to console
+        handler = logging.StreamHandler()
+        logger.addHandler(handler)
+        #Create formatter, using fixed width fields
+        formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
+        handler.setFormatter(formatter)
+        #Set the verbosity, as specified via command line arg
+        logger.setLevel(logging_level)
+
+        return logger
 
     @staticmethod
-    def run_backup(service_name, service_class, service_config):
-        """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
-        click.echo('Backing up ' + service_name)
-        service = service_class(service_config)
-        service.do_backup()
+    def read_config(config_file, defaults):
+        """Use ConfigParser to read in the configuration file from the path specified by config_file"""
+        config = configparser.ConfigParser(default_section='Backup', defaults = defaults)
+        config.read(config_file)
+        return config

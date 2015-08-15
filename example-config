@@ -1,6 +1,7 @@
 [Backup]
-backup_location=~/Documents/backups
-tmp_location=
+# The location backups are stored in.  Will be created if it doesn't exist
+# Can be overriden in each subsection.
+# backup_location=~/Documents/backups
 
 [Evernote]
 url=
