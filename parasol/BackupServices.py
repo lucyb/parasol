@@ -74,10 +74,14 @@ class BackupServices(object):
     def services_to_run(self, section_names):
         """Return the name and config details for each service to run"""
         for section_name in section_names:
-            service_config = self.config_settings[section_name]
+            if section_name in self.config_settings:
+                service_config = self.config_settings[section_name]
 
-            # return configurations for each section we asked to run
-            yield section_name, service_config
+                # return configurations for each section we asked to run
+                yield section_name, service_config
+            else:
+                self.logger.warning("Asked for config section '%s' which was not found in configfile", section_name)
+
 
     @classmethod
     def setup_logging(cls, logging_level):
