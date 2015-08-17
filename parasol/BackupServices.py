@@ -31,25 +31,18 @@ class BackupServices(object):
             'backup_location': os.path.join('~', 'Documents', 'backups')
             }
 
-    def __init__(self, services, config_file, logging_level):
+    def __init__(self, section_names, config_file, logging_level):
         #Get config options
         self.config_settings  = BackupServices.read_config(config_file, defaults = self.config_defaults)
         #Configure logging
         self.logger = BackupServices.setup_logging(logging_level)
-        #Get the section names to run backups for
-        section_names = self.get_sections_to_backup(services)
         #Run the backups
         self.run_backups(section_names)
 
-    def get_sections_to_backup(self, sections):
-        """Return the list of sections to run backups for. Defaults to all"""
-        if not sections:
-            sections = self.config_settings.sections()
-        return sections
 
     def run_backups(self, section_names):
         """Run the backup for each service specified in the config files provided"""
-        for section_name, service_config in self.services_to_run(section_names):
+        for section_name, service_config in self.sections_to_run(section_names):
             try:
                 service_name   = service_config.get('service', section_name)
 
@@ -71,8 +64,11 @@ class BackupServices(object):
         service = service_class(service_config)
         service.do_backup()
 
-    def services_to_run(self, section_names):
+    def sections_to_run(self, section_names = None):
         """Return the name and config details for each service to run"""
+        if not section_names:
+            section_names = self.config_settings.sections()
+
         for section_name in section_names:
             if section_name in self.config_settings:
                 service_config = self.config_settings[section_name]
