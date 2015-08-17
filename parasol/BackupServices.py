@@ -25,7 +25,7 @@ import os.path
 
 class BackupServices(object):
 
-    __service_registry__ = None
+    service_registry = ServiceRegistry(AbstractService)
 
     config_defaults = {
             'backup_location': os.path.join('~', 'Documents', 'backups')
@@ -36,18 +36,17 @@ class BackupServices(object):
         self.config_settings  = BackupServices.read_config(config_file, defaults = self.config_defaults)
         #Configure logging
         self.logger = BackupServices.setup_logging(logging_level)
-        #Populate the list of services, if required
-        self.services = self.populate_services(services)
         #Run the backups
         self.run_backups()
 
     def run_backups(self):
         """Run the backup for each service specified in the config files provided"""
 
-        for section_name, service_config in self.services_to_run():
+        for section_name, service_name in self.services_to_run():
             try:
-                service_name  = self.get_service_name(section_name)
-                service_class = self.service_registry().get(service_name)
+                service_config = self.config_settings[section_name]
+                service_class  = self.service_registry[service_name]
+
                 self.run_backup(section_name, service_class, service_config)
             except ServiceNotFoundException:
                 self.logger.warning('Found config section for {section_name} {[service_name]} but no matching service. Skipping'.format(section_name=section_name, service_name=service_name))
@@ -57,12 +56,6 @@ class BackupServices(object):
                 #Continue so that the next backup can be run
                 #A problem with one service should not stop us from backing up the rest!
                 pass
-
-    def populate_services(self, services):
-        """Return the list of services"""
-        if not services:
-            services = self.config_settings.sections()
-        return services
 
     def run_backup(self, service_name, service_class, service_config):
         """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
@@ -75,23 +68,15 @@ class BackupServices(object):
         for section in self.config_settings.sections():
             service_name = self.get_service_name(section)
 
-            #Return config details for each service that we care about 
-            if service_name in self.services:
-                service_config = self.config_settings[section]
-                yield section, service_config
+            #Return details for each service that we care about 
+            if service_name in self.service_registry.keys:
+                yield section_name, service_name
 
     def get_service_name(self, section):
         """Return the name of the service in this section of the config"""
         if 'service' in self.config_settings[section]:
             return self.config_settings[section]['service']
         return section
-
-    @classmethod
-    def service_registry(cls):
-        """Return a service registry to use"""
-        if cls.__service_registry__ is None:
-            cls.__service_registry__ = ServiceRegistry(AbstractService)
-        return cls.__service_registry__
 
     @classmethod
     def setup_logging(cls, logging_level):
