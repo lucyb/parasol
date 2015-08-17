@@ -49,9 +49,10 @@ class BackupServices(object):
 
     def run_backups(self, section_names):
         """Run the backup for each service specified in the config files provided"""
-        for section_name, service_name in self.services_to_run(section_names):
+        for section_name, service_config in self.services_to_run(section_names):
             try:
-                service_config = self.config_settings[section_name]
+                service_name   = service_config.get('service', section_name)
+
                 service_class  = self.service_registry[service_name]
 
                 self.run_backup(section_name, service_class, service_config)
@@ -73,16 +74,10 @@ class BackupServices(object):
     def services_to_run(self, section_names):
         """Return the name and config details for each service to run"""
         for section_name in section_names:
-            service_name = self.get_service_name(section_name)
-            #Return details for each service that we know about 
-            if service_name in self.service_registry.keys():
-                yield section_name, service_name
+            service_config = self.config_settings[section_name]
 
-    def get_service_name(self, section):
-        """Return the name of the service in this section of the config"""
-        if 'service' in self.config_settings[section]:
-            return self.config_settings[section]['service']
-        return section
+            # return configurations for each section we asked to run
+            yield section_name, service_config
 
     @classmethod
     def setup_logging(cls, logging_level):
