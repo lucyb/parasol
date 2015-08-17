@@ -36,13 +36,21 @@ class BackupServices(object):
         self.config_settings  = BackupServices.read_config(config_file, defaults = self.config_defaults)
         #Configure logging
         self.logger = BackupServices.setup_logging(logging_level)
+        #Get the section names to run backups for
+        section_names = self.get_sections_to_backup(services)
         #Run the backups
-        self.run_backups()
+        self.run_backups(section_names)
 
-    def run_backups(self):
+    def get_sections_to_backup(self, sections):
+        """Return the list of sections to run backups for. Defaults to all"""
+        if not sections:
+            sections = self.config_settings.sections()
+        return sections
+
+    def run_backups(self, section_names):
         """Run the backup for each service specified in the config files provided"""
 
-        for section_name, service_name in self.services_to_run():
+        for section_name, service_name in self.services_to_run(section_names):
             try:
                 service_config = self.config_settings[section_name]
                 service_class  = self.service_registry[service_name]
@@ -63,12 +71,12 @@ class BackupServices(object):
         service = service_class(service_config)
         service.do_backup()
 
-    def services_to_run(self):
+    def services_to_run(self, section_names):
         """Return the name and config details for each service to run"""
-        for section in self.config_settings.sections():
+        for section in section_names:
             service_name = self.get_service_name(section)
 
-            #Return details for each service that we care about 
+            #Return details for each service that we know about 
             if service_name in self.service_registry.keys:
                 yield section_name, service_name
 
