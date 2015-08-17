@@ -57,7 +57,7 @@ class BackupServices(object):
 
                 self.run_backup(section_name, service_class, service_config)
             except ServiceNotFoundException:
-                self.logger.warning('Found config section for {section_name} {[service_name]} but no matching service. Skipping'.format(section_name=section_name, service_name=service_name))
+                self.logger.warning('Found config section for {section_name} [{service_name}] but no matching service. Skipping'.format(section_name=section_name, service_name=service_name))
                 pass
             except:
                 self.logger.exception("Problem backing up {section} [{service}]".format(section = section_name, service = service_name))
