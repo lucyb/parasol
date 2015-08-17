@@ -54,7 +54,7 @@ def list_services(ctx, param, value):
         return
 
     # iterate over the services list, printing names and the docstrings
-    for name, service in BackupServices.service_registry().items():
+    for name, service in BackupServices.service_registry.items():
         click.echo("{} - {}".format(name, inspect.getdoc(service)))
 
     # exit with status 0
