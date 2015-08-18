@@ -32,12 +32,19 @@ class BackupServices(object):
             }
 
     def __init__(self, section_names, config_file, logging_level):
-        #Get config options
-        self.config_settings  = BackupServices.read_config(config_file, defaults = self.config_defaults)
         #Configure logging
         self.logger = BackupServices.setup_logging(logging_level)
+        #Get config options
+        self.config_settings  = self.read_config(config_file)
         #Run the backups
         self.run_backups(section_names)
+
+    def read_config(self, config_file, defaults = config_defaults):
+        """Use ConfigParser to read in the configuration file from the path specified by config_file"""
+        self.logger.debug("Reading config file: %s", config_file)
+        config = configparser.ConfigParser(default_section='Backup', defaults = defaults)
+        config.read(config_file)
+        return config
 
 
     def run_backups(self, section_names):
@@ -94,9 +101,3 @@ class BackupServices(object):
 
         return logger
 
-    @staticmethod
-    def read_config(config_file, defaults):
-        """Use ConfigParser to read in the configuration file from the path specified by config_file"""
-        config = configparser.ConfigParser(default_section='Backup', defaults = defaults)
-        config.read(config_file)
-        return config
