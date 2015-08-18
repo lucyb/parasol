@@ -20,6 +20,25 @@ from parasol.BackupServices import BackupServices
 import click
 import inspect
 
+logging_levels = [
+        'CRITICAL',
+        'ERROR',
+        'WARNING',
+        'INFO',
+        'DEBUG'
+    ]
+
+def calc_logging_level(verbose, quiet):
+    """Returns the appropriate logging level for the application. Defaulting to ERROR if nothing is specified"""
+    if quiet and verbose == 0:
+        #Show critical errors only
+        return logging_levels[0]
+
+    if verbose > 3:
+        #Can't go higher than debug
+        verbose = 3
+    return logging_levels[verbose + 1]
+
 # List services callback
 #
 # This uses a callback to interupt the usual argument handling
@@ -35,7 +54,7 @@ def list_services(ctx, param, value):
         return
 
     # iterate over the services list, printing names and the docstrings
-    for name, service in BackupServices.service_registry().items():
+    for name, service in BackupServices.service_registry.items():
         click.echo("{} - {}".format(name, inspect.getdoc(service)))
 
     # exit with status 0
@@ -48,10 +67,18 @@ def list_services(ctx, param, value):
                         callback     = list_services,
                         expose_value = False,
                         is_eager     = True)
-@click.option('--config', help='Specify location of the config file',
-                         default='config.ini')
-def run(services, config):
-	backupStuff = BackupServices(services, config)
+@click.option('--config',
+                        help='Specify location of the config file',
+                        default='config.ini')
+@click.option('-v', '--verbose',
+                        help='Verbose logging. Can be specified multiple times to increase verbosity', 
+                        count=True)
+@click.option('-q', '--quiet',
+                        help='Quiet logging. Reduce logging output to critical errors only. Will be ignored if -v is specified',
+                        is_flag=True)
+def run(services, config, verbose, quiet):
+    logging_level = calc_logging_level(verbose, quiet)
+    backupStuff   = BackupServices(services, config, logging_level)
 
 if __name__ == '__main__':
     run()

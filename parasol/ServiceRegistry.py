@@ -40,6 +40,9 @@ class ServiceRegistry(object):
     def items(self):
         return self.services.items()
 
+    def keys(self):
+        return self.services.keys()
+
     def get(self, service_name):
         """Return the concrete service having the name specified in service_name"""
         if service_name in self.services:

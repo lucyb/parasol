@@ -18,73 +18,81 @@
 from parasol.services import *
 from parasol.ServiceRegistry import ServiceRegistry, ServiceNotFoundException
 
-import click
 import configparser
+import logging
 import sys
 import os.path
 
 class BackupServices(object):
 
-    __service_registry__ = None
+    service_registry = ServiceRegistry(AbstractService)
 
     config_defaults = {
-            'backup_location': os.path.join('~', 'Documents', 'backups'),
-            'verbose': False
+            'backup_location': os.path.join('~', 'Documents', 'backups')
             }
 
-    def __init__(self, services, config_file):
+    def __init__(self, section_names, config_file, logging_level):
         #Get config options
         self.config_settings  = BackupServices.read_config(config_file, defaults = self.config_defaults)
-        #Populate the list of services, if required
-        self.services = self.populate_services(services)
+        #Configure logging
+        self.logger = BackupServices.setup_logging(logging_level)
         #Run the backups
-        self.run_backups()
+        self.run_backups(section_names)
 
-    def run_backups(self):
+
+    def run_backups(self, section_names):
         """Run the backup for each service specified in the config files provided"""
-
-        for section_name, service_config in self.services_to_run():
+        for section_name, service_config in self.sections_to_run(section_names):
             try:
-                service_name  = self.get_service_name(section_name)
-                service_class = self.service_registry().get(service_name)
-                BackupServices.run_backup(section_name, service_class, service_config)
+                service_name   = service_config.get('service', section_name)
+
+                service_class  = self.service_registry[service_name]
+
+                self.run_backup(section_name, service_class, service_config)
             except ServiceNotFoundException:
-                click.echo('Found config section for {section_name} [{service_name}]  but no matching service. Skipping'.format(section_name=section_name, service_name=service_name))
+                self.logger.warning('Found config section for {section_name} [{service_name}] but no matching service. Skipping'.format(section_name=section_name, service_name=service_name))
                 pass
             except:
-                click.echo(sys.exc_info())
+                self.logger.exception("Problem backing up {section} [{service}]".format(section = section_name, service = service_name))
                 #Continue so that the next backup can be run
                 #A problem with one service should not stop us from backing up the rest!
                 pass
 
-    def populate_services(self, services):
-        """Return the list of services"""
-        if not services:
-            services = self.config_settings.sections()
-        return services
+    def run_backup(self, service_name, service_class, service_config):
+        """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
+        self.logger.info('Backing up {}'.format(service_name))
+        service = service_class(service_config)
+        service.do_backup()
 
-    def services_to_run(self):
+    def sections_to_run(self, section_names = None):
         """Return the name and config details for each service to run"""
-        for section in self.config_settings.sections():
-            service_name = self.get_service_name(section)
+        if not section_names:
+            section_names = self.config_settings.sections()
 
-            #Return config details for each service that we care about 
-            if service_name in self.services:
-                service_config = self.config_settings[section]
-                yield section, service_config
+        for section_name in section_names:
+            if section_name in self.config_settings:
+                service_config = self.config_settings[section_name]
 
-    def get_service_name(self, section):
-        """Return the name of the service in this section of the config"""
-        if 'service' in self.config_settings[section]:
-            return self.config_settings[section]['service']
-        return section
+                # return configurations for each section we asked to run
+                yield section_name, service_config
+            else:
+                self.logger.warning("Asked for config section '%s' which was not found in configfile", section_name)
+
 
     @classmethod
-    def service_registry(cls):
-        """Return a service registry to use"""
-        if cls.__service_registry__ is None:
-            cls.__service_registry__ = ServiceRegistry(AbstractService)
-        return cls.__service_registry__
+    def setup_logging(cls, logging_level):
+        """Setup logger"""
+        logger = logging.getLogger()
+        #Log to console
+        handler = logging.StreamHandler()
+        logger.addHandler(handler)
+        #Create formatter, using fixed width fields
+        formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
+        handler.setFormatter(formatter)
+        #Set the verbosity, as specified via command line arg
+        logger.setLevel(logging_level)
+
+        return logger
 
     @staticmethod
     def read_config(config_file, defaults):
@@ -92,10 +100,3 @@ class BackupServices(object):
         config = configparser.ConfigParser(default_section='Backup', defaults = defaults)
         config.read(config_file)
         return config
-
-    @staticmethod
-    def run_backup(service_name, service_class, service_config):
-        """Run the backup for the service provided by service_class and with the configuration settings in service_config"""
-        click.echo('Backing up ' + service_name)
-        service = service_class(service_config)
-        service.do_backup()
