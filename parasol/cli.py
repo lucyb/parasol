@@ -19,6 +19,7 @@ from parasol.BackupServices import BackupServices
 
 import click
 import inspect
+import os.path
 
 logging_levels = [
         'CRITICAL',
@@ -69,7 +70,7 @@ def list_services(ctx, param, value):
                         is_eager     = True)
 @click.option('--config',
                         help='Specify location of the config file',
-                        default='config.ini')
+                        default=os.path.join(click.get_app_dir('parasol'), 'config.ini'))
 @click.option('-v', '--verbose',
                         help='Verbose logging. Can be specified multiple times to increase verbosity', 
                         count=True)
