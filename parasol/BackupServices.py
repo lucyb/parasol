@@ -22,6 +22,7 @@ import configparser
 import logging
 import sys
 import os.path
+import inspect
 
 class BackupServices(object):
 
@@ -85,9 +86,11 @@ class BackupServices(object):
         logger = logging.getLogger()
         #Log to console
         handler = logging.StreamHandler()
+        #Filter out messages from third party libraries
         if not logging_level == 'DEBUG':
-            #handler.addFilter(logging.Filter('connectionpool'))
-            handler.addFilter(LoggerWhitelist(cls.service_registry().keys()))
+            #Fetch all parasol classes (From https://stackoverflow.com/a/1796247)
+            clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
+            handler.addFilter(LoggerWhitelist(clsmembers))
         logger.addHandler(handler)
         #Create formatter, using fixed width fields
         formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
@@ -105,7 +108,8 @@ class BackupServices(object):
         return config
 
 class LoggerWhitelist(logging.Filter):
-    """Whitelist for logging, from https://stackoverflow.com/a/17276457"""
+    """Whitelist for logging messages"""
+    #From https://stackoverflow.com/a/17276457
     def __init__(self, *whitelist):
         self.whitelist = [logging.Filter(name) for name in whitelist]
 
