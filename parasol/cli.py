@@ -68,6 +68,8 @@ def list_services(ctx, param, value):
                         callback     = list_services,
                         expose_value = False,
                         is_eager     = True)
+# TODO:  Replace exists=True with custom error handling which points user to example config
+# FIXME: resolve_path=True does not expand environmental variables or ~
 @click.option('--config',
                         help='Specify location of the config file',
                         default=os.path.join(click.get_app_dir('parasol'), 'config.ini'),
