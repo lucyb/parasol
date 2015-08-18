@@ -71,6 +71,7 @@ def list_services(ctx, param, value):
 @click.option('--config',
                         help='Specify location of the config file',
                         default=os.path.join(click.get_app_dir('parasol'), 'config.ini'),
+                        show_default=True,
                         type=click.Path(exists=True, dir_okay=False, resolve_path=True))
 @click.option('-v', '--verbose',
                         help='Verbose logging. Can be specified multiple times to increase verbosity',
