@@ -47,7 +47,6 @@ class BackupServices(object):
         config.read(config_file)
         return config
 
-
     def run_backups(self, section_names):
         """Run the backup for each service specified in the config files provided"""
         for section_name, service_config in self.sections_to_run(section_names):
@@ -86,7 +85,6 @@ class BackupServices(object):
             else:
                 self.logger.warning("Asked for config section '%s' which was not found in configfile", section_name)
 
-
     @classmethod
     def setup_logging(cls, logging_level):
         """Setup logger"""
@@ -106,13 +104,6 @@ class BackupServices(object):
         logger.setLevel(logging_level)
 
         return logger
-
-    @staticmethod
-    def read_config(config_file, defaults):
-        """Use ConfigParser to read in the configuration file from the path specified by config_file"""
-        config = configparser.ConfigParser(default_section='Backup', defaults = defaults)
-        config.read(config_file)
-        return config
 
 class LoggerWhitelist(logging.Filter):
     """Whitelist for logging messages"""
