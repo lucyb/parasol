@@ -1,0 +1,6 @@
+build/
+dist/
+venv/
+parasol.egg-info/
+*.cfg
+*.ini
