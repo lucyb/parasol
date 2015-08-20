@@ -17,6 +17,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 from parasol.services import *
 from parasol.ServiceRegistry import ServiceRegistry, ServiceNotFoundException
+from parasol.Logging import LoggingSetup
 
 import configparser
 import logging
@@ -33,7 +34,7 @@ class BackupServices(object):
 
     def __init__(self, section_names, config_file, logging_level):
         #Configure logging
-        self.logger = BackupServices.setup_logging(logging_level)
+        self.logger = LoggingSetup.setup(logging_level)
         #Get config options
         self.config_settings  = self.read_config(config_file)
         #Run the backups
@@ -45,7 +46,6 @@ class BackupServices(object):
         config = configparser.ConfigParser(default_section='Backup', defaults = defaults)
         config.read(config_file)
         return config
-
 
     def run_backups(self, section_names):
         """Run the backup for each service specified in the config files provided"""
@@ -84,20 +84,3 @@ class BackupServices(object):
                 yield section_name, service_config
             else:
                 self.logger.warning("Asked for config section '%s' which was not found in configfile", section_name)
-
-
-    @classmethod
-    def setup_logging(cls, logging_level):
-        """Setup logger"""
-        logger = logging.getLogger()
-        #Log to console
-        handler = logging.StreamHandler()
-        logger.addHandler(handler)
-        #Create formatter, using fixed width fields
-        formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
-        handler.setFormatter(formatter)
-        #Set the verbosity, as specified via command line arg
-        logger.setLevel(logging_level)
-
-        return logger
-
