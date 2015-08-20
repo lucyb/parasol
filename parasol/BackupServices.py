@@ -93,9 +93,7 @@ class BackupServices(object):
         handler = logging.StreamHandler()
         #Filter out messages from third party libraries
         if not logging_level == 'DEBUG':
-            #Fetch all parasol classes (From https://stackoverflow.com/a/8093671)
-            clsmembers = [clsmember[0] for clsmember in inspect.getmembers(sys.modules[__name__], inspect.isclass)]
-            handler.addFilter(LoggerWhitelist(clsmembers))
+            handler.addFilter(LoggerWhitelist())
         logger.addHandler(handler)
         #Create formatter, using fixed width fields
         formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
@@ -107,9 +105,10 @@ class BackupServices(object):
 
 class LoggerWhitelist(logging.Filter):
     """Whitelist for logging messages"""
-    #From https://stackoverflow.com/a/17276457
-    def __init__(self, whitelist):
-        self.whitelist = [logging.Filter(name) for name in whitelist]
+    #Whitelist class from https://stackoverflow.com/a/17276457
+    def __init__(self):
+        #Fetch all parasol classes (from https://stackoverflow.com/a/8093671)
+        self.whitelist = [logging.Filter(clsmember[0]) for clsmember in inspect.getmembers(sys.modules[__name__], inspect.isclass)]
 
     def filter(self, record):
         return any(f.filter(record) for f in self.whitelist)
