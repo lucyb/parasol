@@ -23,7 +23,6 @@ import configparser
 import logging
 import sys
 import os.path
-import inspect
 
 class BackupServices(object):
 
