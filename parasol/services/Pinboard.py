@@ -18,7 +18,6 @@
 from parasol.services.AbstractService import AbstractService
 import parasol.util as util
 
-import datetime
 import requests
 import json
 
@@ -34,7 +33,7 @@ class Pinboard(AbstractService):
         self.token = config['token']
 
     def do_backup(self):
-        filename = 'Pinboard-{}.json'.format(datetime.date.today())
+        filename = '{}.json'.format(self.filename('Pinboard'))
         filepath = self.backup_path(filename)
 
         pinboard = self.connect()

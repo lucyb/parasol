@@ -22,12 +22,14 @@ import click
 import abc
 import os.path
 import logging
+import time
 
 class AbstractService(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, config):
         self.backup_location = util.expandpath(config['backup_location'])
+        self._timestamp      = config['timestamp']
         #Create a child logger for each service based on the logger configured in BackupServices.py
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -38,3 +40,18 @@ class AbstractService(object):
     def backup_path(self, filename):
         """Return the full filepath"""
         return os.path.abspath(os.path.join(self.backup_location, filename))
+
+    def timestamp(self, t = None):
+        """Return the timestamp, or nothing if the timestamp looks falsy"""
+        if t is None:
+            t = time.localtime()
+
+        if not self._timestamp.lower() in ('none', 'false', '0'):
+            return time.strftime(self._timestamp, t)
+        else:
+            return None
+
+    def filename(self, base, extra = None, time = None):
+        """Provides a filename suitable for use in backing up files"""
+        components = filter(None, [base, extra, self.timestamp(time)])
+        return '-'.join(components)

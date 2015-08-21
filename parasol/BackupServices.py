@@ -29,7 +29,8 @@ class BackupServices(object):
     service_registry = ServiceRegistry(AbstractService)
 
     config_defaults = {
-            'backup_location': os.path.join('~', 'Documents', 'backups')
+            'backup_location': os.path.join('~', 'Documents', 'backups'),
+            'timestamp': '%Y-%m-%d',
             }
 
     def __init__(self, section_names, config_file, logging_level):
@@ -43,7 +44,7 @@ class BackupServices(object):
     def read_config(self, config_file, defaults = config_defaults):
         """Use ConfigParser to read in the configuration file from the path specified by config_file"""
         self.logger.debug("Reading config file: %s", config_file)
-        config = configparser.ConfigParser(default_section='Backup', defaults = defaults)
+        config = configparser.ConfigParser(default_section='Backup', defaults = defaults, interpolation = None)
         config.read(config_file)
         return config
 
