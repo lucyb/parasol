@@ -18,7 +18,6 @@
 from parasol.services.AbstractService import AbstractService
 import parasol.util as util
 
-import datetime
 import requests
 import json
 
@@ -59,7 +58,7 @@ class Trello(AbstractService):
 
     def write_board_data(self, board_id, board_name):
         self.logger.info("Backing up {}".format(board_name))
-        filename = 'Trello-{0}-{1}.json'.format(board_name, str(datetime.date.today()));
+        filename = '{}.json'.format(self.filename('Trello', board_name));
         filepath = self.backup_path(filename)
 
         board_url = 'boards/' + board_id
