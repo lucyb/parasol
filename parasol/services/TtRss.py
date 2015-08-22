@@ -18,63 +18,28 @@
 from parasol.services.AbstractService import AbstractService
 import parasol.util as util
 
-import datetime
 import requests
-import json
 
 class TtRss(AbstractService):
     """All of your RSS feeds, as an OPML file"""
 
-    default_url = 'https://tt-rss.org/api'
-
     def __init__(self, config):
         super().__init__(config)
 
-        self.url      = config.get('url', self.default_url)
-        self.username = config['username']
-        self.password = config['password']
+        self.url        = config['url']
+        self.verify_ssl = config.getboolean('verify_ssl', True)
 
     def do_backup(self):
-        filename = 'ttrss-{}.json'.format(datetime.date.today())
+        filename = self.filename() + '.xml'
         filepath = self.backup_path(filename)
 
-        session_id = self.log_in()
+        opml_file = self.connect()
+        util.write(filepath, opml_file.text)
 
-        #TODO handle error gracefully and log out anyway
-        opml = self.download_opml(session_id)
-        self.logger.info('Backing up to {}'.format(filename))
-        util.write(filepath, json.dumps(opml.json()))
-
-        self.log_out(session_id)
-
-    def log_in(self):
-        params = {'format': 'json', 'user': self.username, 'password': self.password}
-        path   = '/login'
-
-        response = self.connect(path, params)
-        #TODO parse json response and extract session id (sid)
-        return session_id
-
-    def download_opml(self, session_id):
-        params = {'format': 'json', 'sid': session_id}
-        path   = '/getFeeds'
-        #TODO this might be /getFeedTree
-        opml = self.connect(path, params)
-
-        return opml
-
-    def log_out(self, session_id):
-        params = {'format': 'json', 'sid': session_id}
-        path   = '/logout'
-
-        self.connect(path, params)
-
-    def connect(self, path, params):
-        response = requests.get(self.url + path, params = params, verify=True)
+    def connect(self):
+        response = requests.get(self.url, verify=self.verify_ssl)
 
         #Throw error if response is not 200
         response.raise_for_status()
-
-        #TODO check json response for error
 
         return response
