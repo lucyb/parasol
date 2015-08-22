@@ -4,6 +4,7 @@
 # backup_location=~/Documents/backups
 
 # The timestamp appended to appropriate backup filenames
+# See http://strftime.org/ for help on how this is interpreted
 # timestamp = %Y-%m-%d
 # or
 # timestamp = None
