@@ -43,7 +43,7 @@ class AbstractService(object):
 
     def timestamp(self):
         """Return the timestamp, or nothing if the timestamp looks falsy"""
-        if not self._timestamp.lower() in ('none', 'false', '0'):
+        if not self.timestamp_format.lower() in ('none', 'false', '0'):
             return time.strftime(self.timestamp_format)
         else:
             return None
