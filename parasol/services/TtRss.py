@@ -34,6 +34,8 @@ class TtRss(AbstractService):
         filepath = self.backup_path(filename)
 
         opml_file = self.connect()
+
+        self.logger.info('Backing up to {}'.format(filename))
         util.write(filepath, opml_file.text)
 
     def connect(self):
