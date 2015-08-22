@@ -1,6 +1,6 @@
 [Backup]
 # The location backups are stored in.  Will be created if it doesn't exist
-# Can be overriden in each subsection.
+# Can be overridden in each subsection.
 # backup_location=~/Documents/backups
 
 # The timestamp appended to appropriate backup filenames
