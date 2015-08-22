@@ -8,7 +8,8 @@ setup(
     install_requires=[
         'Click',
         'requests',
-        'paramiko'
+        'paramiko',
+        'python-slugify'
     ],
     entry_points='''
         [console_scripts]
