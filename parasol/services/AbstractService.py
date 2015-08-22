@@ -28,8 +28,8 @@ class AbstractService(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, config):
-        self.backup_location = util.expandpath(config['backup_location'])
-        self._timestamp      = config['timestamp']
+        self.backup_location   = util.expandpath(config['backup_location'])
+        self.timestamp_format  = config['timestamp']
         #Create a child logger for each service based on the logger configured in BackupServices.py
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -44,7 +44,7 @@ class AbstractService(object):
     def timestamp(self):
         """Return the timestamp, or nothing if the timestamp looks falsy"""
         if not self._timestamp.lower() in ('none', 'false', '0'):
-            return time.strftime(self._timestamp)
+            return time.strftime(self.timestamp_format)
         else:
             return None
 
