@@ -41,17 +41,14 @@ class AbstractService(object):
         """Return the full filepath"""
         return os.path.abspath(os.path.join(self.backup_location, filename))
 
-    def timestamp(self, t = None):
+    def timestamp(self):
         """Return the timestamp, or nothing if the timestamp looks falsy"""
-        if t is None:
-            t = time.localtime()
-
         if not self._timestamp.lower() in ('none', 'false', '0'):
-            return time.strftime(self._timestamp, t)
+            return time.strftime(self._timestamp)
         else:
             return None
 
-    def filename(self, base, extra = None, time = None):
+    def filename(self, base, extra = None):
         """Provides a filename suitable for use in backing up files"""
-        components = filter(None, [base, extra, self.timestamp(time)])
+        components = filter(None, [base, extra, self.timestamp()])
         return '-'.join(components)
