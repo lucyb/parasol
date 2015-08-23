@@ -20,7 +20,7 @@ import parasol.util as util
 
 import requests
 
-class TtRss(AbstractService):
+class TinyTinyRss(AbstractService):
     """All of your RSS feeds, as an OPML file"""
 
     def __init__(self, config):

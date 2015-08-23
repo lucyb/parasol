@@ -26,7 +26,7 @@ key=
 token=
 
 [tt-rss]
-service=TtRss
+service=TinyTinyRss
 #URL is mandatory for Tiny Tiny RSS. It is the location of your OPML export file.
 #Retrieve it by going to Preferences->Feeds and clicking on 'Display published OPML URL'.
 url=
