@@ -33,7 +33,7 @@ class Pinboard(AbstractService):
         self.token = config['token']
 
     def do_backup(self):
-        filename = self.filename('json')
+        filename = self.filename(ext = 'json')
         filepath = self.backup_path(filename)
 
         pinboard = self.connect()
