@@ -50,8 +50,12 @@ class AbstractService(object):
         else:
             return None
 
-    def filename(self, extra = None):
+    def filename(self, extension, extra = None):
         """Provides a filename suitable for use in backing up files"""
         safe_name  = slugify.slugify(self.name)
+        if extra:
+            extra  = slugify.slugify(extra)
+
         components = filter(None, [safe_name, extra, self.timestamp()])
-        return '-'.join(components)
+        slugified  = '-'.join(components)
+        return '.'.join([slugified, extension])
