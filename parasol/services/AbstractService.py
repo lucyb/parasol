@@ -23,11 +23,13 @@ import abc
 import os.path
 import logging
 import time
+import slugify
 
 class AbstractService(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, config):
+        self.name              = config.name
         self.backup_location   = util.expandpath(config['backup_location'])
         self.timestamp_format  = config['timestamp']
         #Create a child logger for each service based on the logger configured in BackupServices.py
@@ -48,7 +50,12 @@ class AbstractService(object):
         else:
             return None
 
-    def filename(self, base, extra = None):
+    def filename(self, ext, extra = None):
         """Provides a filename suitable for use in backing up files"""
-        components = filter(None, [base, extra, self.timestamp()])
-        return '-'.join(components)
+        safe_name  = slugify.slugify(self.name)
+        if extra:
+            extra  = slugify.slugify(extra)
+
+        components = filter(None, [safe_name, extra, self.timestamp()])
+        slugified  = '-'.join(components)
+        return '.'.join([slugified, ext])

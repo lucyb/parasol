@@ -24,3 +24,11 @@ service=Trello
 url=https://api.trello.com/
 key=
 token=
+
+[tt-rss]
+service=TinyTinyRss
+#URL is mandatory for Tiny Tiny RSS. It is the location of your OPML export file.
+#Retrieve it by going to Preferences->Feeds and clicking on 'Display published OPML URL'.
+url=
+#Enable or disable ssl certificate verification. Enabled by default.
+verify_ssl=

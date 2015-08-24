@@ -19,33 +19,27 @@ from parasol.services.AbstractService import AbstractService
 import parasol.util as util
 
 import requests
-import json
 
-class Pinboard(AbstractService):
-    """All of your bookmarks"""
-
-    default_url = 'https://api.pinboard.in/v1/'
+class TinyTinyRss(AbstractService):
+    """All of your RSS feeds, as an OPML file"""
 
     def __init__(self, config):
         super().__init__(config)
 
-        self.url   = config.get('url', self.default_url)
-        self.token = config['token']
+        self.url        = config['url']
+        self.verify_ssl = config.getboolean('verify_ssl', True)
 
     def do_backup(self):
-        filename = self.filename(ext = 'json')
+        filename = self.filename(ext = 'xml')
         filepath = self.backup_path(filename)
 
-        pinboard = self.connect()
+        opml_file = self.connect()
+
         self.logger.info('Backing up to {}'.format(filename))
-        util.write(filepath, json.dumps(pinboard.json()))
+        util.write(filepath, opml_file.text)
 
     def connect(self):
-        auth_token = self.token
-        path       = 'posts/all'
-        params     = {'format': 'json', 'auth_token': auth_token}
-
-        response = requests.get(self.url + path, params = params, verify=True)
+        response = requests.get(self.url, verify=self.verify_ssl)
 
         #Throw error if response is not 200
         response.raise_for_status()

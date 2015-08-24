@@ -58,7 +58,7 @@ class Trello(AbstractService):
 
     def write_board_data(self, board_id, board_name):
         self.logger.info("Backing up {}".format(board_name))
-        filename = '{}.json'.format(self.filename('Trello', board_name));
+        filename = self.filename(ext = 'json', extra = board_name);
         filepath = self.backup_path(filename)
 
         board_url = 'boards/' + board_id
