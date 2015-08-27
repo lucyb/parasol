@@ -1,5 +1,7 @@
 
 import os.path
+import logging
+from functools import wraps
 
 def expandpath(path):
     """Expand out a path with both ~ and ENV variables"""
@@ -21,3 +23,14 @@ def write(filename, data, append=False, binary = False):
 
     with open(filename, mode) as fd:
         fd.write(data)
+
+def trap_errors(f):
+    """A decorator to trap and log exceptions"""
+    @wraps(f)
+    def wrapper(*args, **kwds):
+        try:
+            return f(*args, **kwds)
+        except Exception:
+            logger = logging.getLogger(args[0].__class__.__name__)
+            logger.exception("[{}]".format(f.__name__))
+    return wrapper

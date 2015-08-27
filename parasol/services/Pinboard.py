@@ -32,6 +32,7 @@ class Pinboard(AbstractService):
         self.url   = config.get('url', self.default_url)
         self.token = config['token']
 
+    @util.trap_errors
     def do_backup(self):
         filename = self.filename(ext = 'json')
         filepath = self.backup_path(filename)

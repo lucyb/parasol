@@ -38,6 +38,7 @@ class Trello(AbstractService):
         for board_id, board_name in self.boards_to_backup().items():
             self.write_board_data(board_id, board_name)
 
+    @util.trap_errors
     def connect(self, url_path):
         params   = {'format': 'json', 'key' : self.key, 'token': self.token}
 
@@ -47,7 +48,7 @@ class Trello(AbstractService):
 
         return response
 
-
+    @util.trap_errors
     def boards_to_backup(self):
         boards = self.connect('members/me/boards')
         board_dict = {}
