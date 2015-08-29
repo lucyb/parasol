@@ -24,7 +24,7 @@ def write(filename, data, append=False, binary = False):
     with open(filename, mode) as fd:
         fd.write(data)
 
-def trap_errors(func=None, msg=""):
+def trap_errors(exception, msg=""):
     """A decorator to trap and log exceptions.
        Usage:
        @trap_errors
@@ -35,11 +35,8 @@ def trap_errors(func=None, msg=""):
         def wrapped(*args, **kwds):
             try:
                 return func(*args, **kwds)
-            except Exception:
+            except exception:
                 logger = logging.getLogger(args[0].__class__.__name__)
                 logger.exception("[{}] {}".format(func.__name__, msg))
         return wrapped
-    #Allow decorator to be called as a function or not
-    if func:
-        return decorator(func)
     return decorator
