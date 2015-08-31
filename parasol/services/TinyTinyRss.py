@@ -30,7 +30,7 @@ class TinyTinyRss(AbstractService):
         self.verify_ssl = config.getboolean('verify_ssl', True)
 
     def do_backup(self):
-        filename = self.filename(ext = 'xml')
+        filename = self.filename(ext = 'opml')
         filepath = self.backup_path(filename)
 
         opml_file = self.connect()
