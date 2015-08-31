@@ -33,7 +33,7 @@ class Trello(AbstractService):
         self.key   = config['key']
         self.token = config['token']
 
-    @util.trap_errors("Exception", "aaaaahh, backup!")
+    @util.trap_errors(Exception, "aaaaahh, backup!")
     def do_backup(self):
         #For each board, fetch all data and write the json to a file
         for board_id, board_name in self.boards_to_backup().items():
@@ -56,7 +56,7 @@ class Trello(AbstractService):
 
         return board_dict
 
-    @util.trap_errors("Exception", "Unable to backup board")
+    @util.trap_errors(Exception, "Unable to backup board")
     def write_board_data(self, board_id, board_name):
         self.logger.info("Backing up {}".format(board_name))
         filename = self.filename(ext = 'json', extra = board_name);
