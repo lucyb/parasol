@@ -29,7 +29,6 @@ class TinyTinyRss(AbstractService):
         self.url        = config['url']
         self.verify_ssl = config.getboolean('verify_ssl', True)
 
-    @util.trap_errors
     def do_backup(self):
         filename = self.filename(ext = 'xml')
         filepath = self.backup_path(filename)

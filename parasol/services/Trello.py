@@ -33,8 +33,8 @@ class Trello(AbstractService):
         self.key   = config['key']
         self.token = config['token']
 
-    @util.trap_errors(util.HTTPAuthorisationError, "Not authorised: key or token is incorrect.")
-    @util.trap_errors(requests.exceptions.ConnectionError, "Unable to connect. Please check the URL.")
+    @util.trap_error(util.HTTPAuthorisationError, "Not authorised: key or token is incorrect.")
+    @util.trap_error(requests.exceptions.ConnectionError, "Unable to connect. Please check the URL.")
     @util.custom_http_error
     def do_backup(self):
         #For each board, fetch all data and write the json to a file
@@ -58,7 +58,6 @@ class Trello(AbstractService):
 
         return board_dict
 
-    @util.trap_errors(Exception, "Unable to backup board")
     def write_board_data(self, board_id, board_name):
         self.logger.info("Backing up {}".format(board_name))
         filename = self.filename(ext = 'json', extra = board_name);

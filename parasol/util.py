@@ -42,10 +42,10 @@ def custom_http_error(func):
             raise e
     return wrapped
 
-def trap_errors(exception, msg=""):
+def trap_error(exception, msg=""):
     """A decorator to trap and log exceptions.
        Usage:
-       @trap_errors(exception_class, msg="error description to add to log")
+       @trap_error(exception_class, msg="error description to add to log")
     """
     def decorator(func):
         @wraps(func)
