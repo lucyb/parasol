@@ -29,6 +29,7 @@ class TinyTinyRss(AbstractService):
         self.url        = config['url']
         self.verify_ssl = config.getboolean('verify_ssl', True)
 
+    @util.trap_error(requests.exceptions.ConnectionError, "Unable to connect. Please check the URL.")
     def do_backup(self):
         filename = self.filename(ext = 'xml')
         filepath = self.backup_path(filename)

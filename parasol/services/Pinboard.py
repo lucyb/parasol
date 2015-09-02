@@ -32,7 +32,7 @@ class Pinboard(AbstractService):
         self.url   = config.get('url', self.default_url)
         self.token = config['token']
 
-    @util.trap_error(util.HTTPAuthorisationError, "Not authorised: key or token is incorrect.")
+    @util.trap_error(util.HTTPAuthorisationError, "Not authorised: token is incorrect.")
     @util.trap_error(requests.exceptions.ConnectionError, "Unable to connect. Please check the URL.")
     @util.custom_http_error
     def do_backup(self):
@@ -43,7 +43,6 @@ class Pinboard(AbstractService):
         self.logger.info('Backing up to {}'.format(filename))
         util.write(filepath, json.dumps(pinboard.json()))
 
-    @util.trap_error(requests.exceptions.ConnectionError, "Unable to connect. Please check the URL.")
     def connect(self):
         auth_token = self.token
         path       = 'posts/all'
