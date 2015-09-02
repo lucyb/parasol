@@ -33,7 +33,9 @@ class Trello(AbstractService):
         self.key   = config['key']
         self.token = config['token']
 
-    @util.trap_errors(Exception, "aaaaahh, backup!")
+    @util.trap_errors(util.HTTPAuthorisationError, "Not authorised: key or token is incorrect.")
+    @util.trap_errors(requests.exceptions.ConnectionError, "Unable to connect. Please check the URL.")
+    @util.custom_http_error
     def do_backup(self):
         #For each board, fetch all data and write the json to a file
         for board_id, board_name in self.boards_to_backup().items():
