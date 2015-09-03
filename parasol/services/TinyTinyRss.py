@@ -29,6 +29,8 @@ class TinyTinyRss(AbstractService):
         self.url        = config['url']
         self.verify_ssl = config.getboolean('verify_ssl', True)
 
+    @util.trap_error(util.HTTPInternalServiceError,       "An unexpected error occurred, please try again later.")
+    @util.trap_error(requests.exceptions.ConnectionError, "Unable to connect. Please check the URL.")
     def do_backup(self):
         filename = self.filename(ext = 'opml')
         filepath = self.backup_path(filename)
@@ -41,7 +43,7 @@ class TinyTinyRss(AbstractService):
     def connect(self):
         response = requests.get(self.url, verify=self.verify_ssl)
 
-        #Throw error if response is not 200
-        response.raise_for_status()
+        #Throw informative error if response is not 200
+        util.raise_for_status(response)
 
         return response

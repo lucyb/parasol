@@ -32,6 +32,9 @@ class Pinboard(AbstractService):
         self.url   = config.get('url', self.default_url)
         self.token = config['token']
 
+    @util.trap_error(util.HTTPAuthorisationError,         "Not authorised: token is incorrect.")
+    @util.trap_error(util.HTTPInternalServiceError,       "An unexpected error occurred, please try again later.")
+    @util.trap_error(requests.exceptions.ConnectionError, "Unable to connect. Please check the URL.")
     def do_backup(self):
         filename = self.filename(ext = 'json')
         filepath = self.backup_path(filename)
@@ -47,7 +50,7 @@ class Pinboard(AbstractService):
 
         response = requests.get(self.url + path, params = params, verify=True)
 
-        #Throw error if response is not 200
-        response.raise_for_status()
+        #Throw informative error if response is not 200
+        util.raise_for_status(response)
 
         return response
