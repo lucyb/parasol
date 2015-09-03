@@ -35,9 +35,9 @@ def raise_for_status(response):
     """
     #Raise any custom errors
     if 401 == response.status_code:
-        raise HTTPAuthorisationError(e)
+        raise HTTPAuthorisationError("401 " + response.reason)
     if 500 == response.status_code:
-        raise HTTPInternalServiceError(e)
+        raise HTTPInternalServiceError("500 " + response.reason)
 
     #Throw an error if response does not have a HTTP 200 status code or one of the above codes
     response.raise_for_status()
