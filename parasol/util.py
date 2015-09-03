@@ -33,15 +33,14 @@ def raise_for_status(response):
        Returns a HTTPInteralServiceError for 500 responses.
        Returns original HTTPError otherwise.
     """
-    try:
-        #requests will throw an error if response does not have a HTTP 200 status code
-        response.raise_for_status()
-    except requests.HTTPError as e:
-        if 401 == e.response.status_code:
-            raise HTTPAuthorisationError(e)
-        if 500 == e.response.status_code:
-            raise HTTPInternalServiceError(e)
-        raise e
+    #Raise any custom errors
+    if 401 == response.status_code:
+        raise HTTPAuthorisationError(e)
+    if 500 == response.status_code:
+        raise HTTPInternalServiceError(e)
+
+    #Throw an error if response does not have a HTTP 200 status code or one of the above codes
+    response.raise_for_status()
 
 def trap_error(exception, msg=""):
     """A decorator to trap and log exceptions.
