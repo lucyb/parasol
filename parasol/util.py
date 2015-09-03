@@ -55,10 +55,11 @@ def trap_error(exception, msg=""):
                 return func(*args, **kwds)
             except exception:
                 logger = logging.getLogger(args[0].__class__.__name__)
-                logger.error(msg)
                 if logger.isEnabledFor(logging.DEBUG):
                     #Display traceback ony if debugging is enabled
-                    logger.exception("[{}]".format(func.__name__))
+                    logger.exception(msg)
+                else:
+                    logger.error(msg)
         return wrapped
     return decorator
 
