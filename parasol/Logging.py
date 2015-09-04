@@ -22,7 +22,7 @@ import inspect
 
 #Used to add to the whitelist below
 from parasol.services import *
-from parasol.ServiceRegistry import ServiceRegistry, ServiceNotFoundException
+from parasol.ServiceRegistry import *
 from parasol.util import *
 
 class LoggingSetup(object):
