@@ -19,12 +19,15 @@ from parasol.services.AbstractService import AbstractService
 import parasol.util as util
 
 import requests
+import os.path
 import json
 
 class Trello(AbstractService):
     """All your organisation with everyone"""
 
-    default_url = 'https://api.trello.com/1/'
+    default_url   = 'https://api.trello.com/1/'
+    #Ignore the Welcome Board
+    ignore_boards = ['5480d754127a52ce96eb950b']
 
     def __init__(self, config):
         super().__init__(config)
@@ -41,10 +44,17 @@ class Trello(AbstractService):
         for board_id, board_name in self.boards_to_backup().items():
             self.write_board_data(board_id, board_name)
 
-    def connect(self, url_path):
-        params   = {'format': 'json', 'key' : self.key, 'token': self.token}
+    def connect(self, url_path, absolute_path = False, **extra_params):
+        params = {'format': 'json', 'key' : self.key, 'token': self.token}
+        if extra_params is not None:
+            #This will overwrite params if there are matching keys
+            params.update(extra_params)
 
-        response = requests.get(self.url + url_path, params = params, verify=True)
+        url = ''
+        if not absolute_path:
+            url = self.url
+
+        response = requests.get(url + url_path, params = params, verify=True)
 
         util.raise_for_status(response)     #Throw informative error if response is not 200
 
@@ -53,30 +63,44 @@ class Trello(AbstractService):
     def boards_to_backup(self):
         boards = self.connect('members/me/boards')
         board_dict = {}
-        for boardJson in boards.json():
-            board_dict[boardJson['id']] = boardJson['name']
+        for board_json in boards.json():
+            board_id = board_json['id']
+            if board_id not in self.ignore_boards and not board_json['closed']:
+                board_dict[board_id] = board_json['name']
 
         return board_dict
 
     def write_board_data(self, board_id, board_name):
         self.logger.info("Backing up {}".format(board_name))
-        filename = self.filename(ext = 'json', extra = board_name);
+        filename = self.filename(ext = 'json', extra = board_name)
         filepath = self.backup_path(filename)
 
         board_url = 'boards/' + board_id
+        #See https://trello.com/docs/api/board/
+        params = {'actions': 'all', 'actions_limit': '1000', 'cards': 'all', 
+                'lists': 'all', 'list_fields': 'all', 'members': 'all', 
+                'checklists': 'all', 'fields': 'all', 'card_attachments': 'true', 
+                'card_checklists': 'all', 'labels': 'all', 'organization': 'true'}
 
         board_info = {}
 
-        board = self.connect(board_url)
+        board = self.connect(board_url, **params)
         board_info['board'] = board.json()
 
-        lists = self.connect(board_url + '/lists')
-        board_info['lists'] = lists.json()
-
-        cards = self.connect(board_url + '/cards')
-        board_info['cards'] = cards.json()
-
-        checklists = self.connect(board_url + '/checklists')
-        board_info['checklists'] = checklists.json()
+        for card in board_info['board']['cards']:
+            for idx, attachment in enumerate(card['attachments']):
+                attachmentpath = self.download_attachment(attachment, board_name)
+                card['attachments'][idx]['localurl'] = attachmentpath
 
         util.write(filepath, json.dumps(board_info))
+
+    def download_attachment(self, attachment, board_name):
+        self.logger.info("Downloading attachments for {}".format(board_name))
+
+        filename = attachment['id'] + '-' + attachment['name']
+        filepath = self.backup_path(os.path.join(board_name, filename))
+
+        to_download = attachment['url']
+        result = self.connect(to_download, absolute_path = True)
+        util.write(filepath, result.content, binary = True)
+        return filepath

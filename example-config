@@ -22,7 +22,11 @@ token=
 [Trello]
 service=Trello
 url=https://api.trello.com/
+#Generate an app key by going to https://trello.com/app-key
 key=
+#Then follow the instructions to generate a user token
+#Alternatively, browse directly to the following url to generate a token. Just replace MyAppKey with the key above and change the params as required
+#https://trello.com/1/authorize?key=MyAppKey&name=Parasol&expiration=30days&response_type=token 
 token=
 
 [tt-rss]
