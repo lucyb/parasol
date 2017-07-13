@@ -2,5 +2,6 @@ build/
 dist/
 venv/
 parasol.egg-info/
+__pycache__
 *.cfg
 *.ini
